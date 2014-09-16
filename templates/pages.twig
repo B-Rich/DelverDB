@@ -1,0 +1,17 @@
+{% if pageLimit > 1 %}
+	{% if pageNumber > pageOffset %}
+		<a href="{{ pageURL }}page=0" >&lt;&lt;</a>
+	{% endif %}
+	
+	{% for i in range( pageNumber - pageOffset, pageNumber + pageOffset ) %}
+		{% if i == pageNumber %}
+			{{ i+1 }}
+		{% elseif i >= 0 and i < pageLimit %}
+			<a href="{{ pageURL }}page={{ i }}" >{{ i+1 }}</a>
+		{% endif %}
+	{% endfor %}
+	
+	{% if pageNumber < pageLimit - pageOffset - 1 %}
+		<a href="{{ pageURL }}page={{ pageLimit-1 }}" >&gt;&gt;</a>
+	{% endif %}
+{% endif %}

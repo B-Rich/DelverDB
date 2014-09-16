@@ -1,0 +1,20 @@
+<div class="UserBar">
+{% if isloggedin %}
+<p>Username: {{username}}</p>
+<a href="logout.php">Log Out</a>
+{% else %}
+<!-- <form action="{{loginurl}}" method="post"> -->
+<form action='index.php' method='post'>
+	<h3>Login</h3>
+	Username <input type="text" maxlength="40" id="LoginUsernameField" />
+	Password <input type="password" maxlength="50" id="LoginPasswordField" />
+	<input type="button"  value="Log In" onclick="javascript:SubmitLogin()"/>
+</form>
+<a href="register.php">Create a new account</a>
+{% endif %}
+
+{% if loginerrormessage is defined %}
+<p>{{loginerrormessage}}</p>
+{% endif %}
+
+</div>

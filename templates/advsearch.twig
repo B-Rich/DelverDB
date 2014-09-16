@@ -1,0 +1,111 @@
+<table class="AdvSearchAllTable"  border="1">
+<tr>
+<td>
+<table>
+{% for item in parametertypes %}
+	<tr>
+	<td class='AdvSearchParamHeader'>
+		{{ item.name }}: 
+	</td>
+	<td>
+	{% if item.boolField %}
+	<select id='{{item.id}}bool'>
+		<option value='and' {% if item.defaultbool == 'and' %}selected="selected"{%endif%}>and</option>
+		<option value='or'  {% if item.defaultbool == 'or'  %}selected="selected"{%endif%}>or</option>
+		<option value='not' {% if item.defaultbool == 'not' %}selected="selected"{%endif%}>not</option>
+	</select>
+	{% endif %}
+	
+	{% if item.id == 'order' %}
+	<select id='ordercomp'>
+		<option value='&gt;'>Asc</option>
+		<option value='&lt;'>Desc</option>
+	</select>
+	{% endif %}
+	
+	{% if item.fieldtype == 'text' %}
+		<input type='text' id="{{item.id}}field" class="AdvSearchTextField"/>
+		
+	{% elseif item.fieldtype == 'groupselect' %}
+		<select class='AdvDropdownField' id="{{item.id}}field">
+		<option>&nbsp;</option>
+		{% for optgroup in item.optiongroups %}
+			<optgroup label="{{optgroup.title}}">
+			{% for option in optgroup.options %}
+				<option value="{{option.value}}">{{option.label}}</option>
+			{% endfor %}
+			</optgroup>
+		{% endfor %}
+		</select>
+		
+	{% elseif item.fieldtype == 'select' %}
+		<select class='AdvDropdownField' id="{{item.id}}field">
+		<option>&nbsp;</option>
+		{% for option in item.options %}
+			<option value="{{ option.value }}">{{ option.label }}</option>
+		{% endfor %}
+		</select>
+	{% elseif item.fieldtype == 'numeric' %}
+		<select id='{{item.id}}comp'>
+			<option value='=' >=</option>
+			<option value='<' >&lt;</option>
+			<option value='>' >&gt;</option>
+			<option value='<=' >&lt;=</option>
+			<option value='>=' >&gt;=</option>
+		</select>
+		<input type='text' id="{{item.id}}field" class="AdvSearchNumberField"/>
+	{% endif %}
+	</td>
+	<td>
+		<input type='button' value='Add' onclick="javascript:AddParam('{{item.id}}')" />
+	</td>
+</tr>
+	{% if item.id == 'colour' %}
+	<tr>
+		<td></td>
+		<td>
+		<label>
+			Requires Multicoloured: <input type='checkbox' id='RequiresMulticoloured' />
+		</label>
+		</br>
+		<label>
+			Exclude Unselected: <input type="checkbox" id="ExcludeUnselectedColours" />
+		</label>
+		
+		</td>
+	</tr>
+	<tr>
+		<td class='AdvSearchParamHeader'>
+		Colour Identity:
+	</td>
+	<td>
+		{% for colour in colours %}
+			<label title="{{ colour.name }}">
+				<input type="checkbox" id="colour_identity_cb_{{ colour }}" checked="checked" />
+				<img src="images/{{ colour }}.png" alt="{{ colour }}" />
+			</label>
+		{% endfor %}
+		</td>
+		<td></td>
+		</tr>
+	{% endif %}
+{% endfor %}
+</table>
+</td>
+<td class='AdvSearchParametersTD' >
+
+<form id="parametersform" action="advresults.php" method="get">
+	<input type="button" value="Search" onclick="javascript:Submit()" />
+</form>
+
+{% if isloggedin %}
+<label>
+	<input type='checkbox' id='mycards' value='mycards'> My Cards Only
+</label>
+{% endif %}
+<p id="ParametersList">Parameters</p>
+
+<div id="ParameterDiv">None yet</div>
+</td>
+</tr>
+</table>

@@ -1,0 +1,29 @@
+
+<div>
+	<table class="SearchResultTable">
+		<tr>
+			<td>
+				<div id="numCardsFoundDiv">No Search Entered</div>
+				<div id="searchResultDiv" class="SearchResultLeftDiv"></div>
+			</td>
+			<td class="rightCardSearchTD">
+				<div id="cardDetailsDiv">
+					<a href="javascript:void()" target="_blank" id="SelectedCardLink" >
+					<img src="images/cardback.jpg" class="SelectedCardImg"
+						id="SelectedCardImg" 
+						alt="No Card Selected" />
+					</a>
+					{% if isloggedin %}
+						<b>Total: <span id="CardOwnershipTotal">0</span></b>
+					{% endif %}
+						<div id='SelectedCardExpansions' class='SelectedCardExpansions'></div>
+					{% if isloggedin %}
+						<input type="text" id="CardCountField" />
+						<input type="button" onclick="javascript:AddCardButton()" value="Add" />
+						<div id="AddCardMessageDiv"></div>
+					{% endif %}
+				</div>
+			</td>
+		</tr>
+	</table>
+</div>

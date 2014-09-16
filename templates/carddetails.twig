@@ -1,0 +1,160 @@
+<table border="2">
+	<tr>
+		<td>{{ card.name|raw }}</td>
+		
+		<td>
+		{% if isloggedin %}
+		<a href="carddecks.php?id={{ card.id }}">
+			Decks With {{ card.name|raw }}
+		</a>
+		{% endif %}
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<img src="{{ card.sets[setindex].imageurl|raw }}" />
+		</td>
+		<td>
+			<table border="0">
+				<tr>
+					<td>Card Name:</td>
+					<td>{{ card.name|raw }}</td>
+				</tr>
+				
+				{% if card.cost %}
+				<tr>
+					<td>Mana Cost :</td>
+					<td>{% autoescape false %}{{ card.cost}} {% endautoescape %}</td>
+				</tr>
+				{% endif %}
+	
+				<tr>
+					<td>CMC:</td>
+					<td>{{ card.cmc }}</td>
+				</tr>
+				<tr>
+					<td>Types:</td>
+					<td>{{ card.type }} {% if card.subtype %} &mdash; {{ card.subtype
+						}} {% endif %}</td>
+				</tr>
+				{% if card.rules %}
+				<tr>
+					<td>Card Text:</td>
+					<td>{% autoescape false %} {{ card.rules|raw }}{% endautoescape %}</td>
+				</tr>
+				{% endif %} 
+				{% if card.power is not null and card.toughness is not null
+				 or card.loyalty is not null or card.handmod is not null
+				 and card.lifemod is not null %}
+				<tr>
+					<td>
+					{% if card.power is not null and card.toughness is not null %}
+						P/T: 
+					{% elseif card.loyalty is not null %}
+						Loyalty:
+					{% else %}
+						Hand/Life: 
+					{% endif %}</td>
+					<td>
+					{% if card.power is not null and card.toughness is not null %}
+					
+						{{ card.power }}/{{ card.toughness }} 
+					{% elseif card.loyalty is not null %}
+						{{ card.loyalty }}
+					{% elseif card.handmod and card.lifemod %}
+						{{ card.handmod }}/{{ card.lifemod }}
+					{% endif %}
+					</td>
+				</tr>
+				{% endif %}
+				
+				<tr>
+					<td>Expansion:</td>
+					<td>
+					{% if isloggedin %}
+						{{ card.sets[setindex].count }} x 
+					{% endif %}
+					<img src="{{ card.sets[setindex].symbolurl }}" /> <a
+						href="advresults.php?expansion[]=|{{card.sets[setindex].code}}&amp;page=0">
+							{{card.sets[setindex].name }} </a>
+					</td>
+				</tr>
+				
+				{% if card.sets|length > 1 %}
+				<tr>
+					<td>Other Sets:</td>
+					<td>
+					{% for set in card.sets %}
+						{% if set.code != card.sets[setindex].code %}
+							{% if isloggedin %}
+								{{ set.count }} x 
+							{% endif %}
+						 <a href="carddetails.php?id={{card.id}}&amp;set={{ set.code }}"><img
+							src="{{ set.symbolurl }}" alt="{{ set.code }}" /></a>
+						{% endif %} 
+					{% endfor %}
+					</td>
+				</tr>
+				{% endif %}
+				
+				<tr>
+   					<td>Rarity: </td>
+   					<td>{{ raritystring }} </td>
+ 				</tr>
+ 				 
+  				<tr>
+    				<td>Card Number:</td>
+   					<td>{{ card.sets[setindex].cnum }}</td>
+  				</tr>
+  					
+  				<tr>
+    				<td>Artist</td>
+    				<td><a href="{{artisturl}}">{{ card.sets[setindex].artist }}</a></td>
+  				</tr>
+  			</table>
+  		</td>
+  	<tr>
+    	<td></td>
+   		<td>
+   		Rating:
+   		{% for i in 0..4 %}
+		 	{% if rating_stars >= i + 1 %}
+				<img src="images/icons/star_full_32.png" class='TextManaSymbol'/>
+			{% elseif (rating_stars - i) >=  0.5 %}
+				<img src="images/icons/star_half_32.png" class='TextManaSymbol'/>
+			{% else %}
+				<img src="images/icons/star_empty_32.png" class='TextManaSymbol'/>
+			{% endif %}
+		{% endfor %}
+		({{ card.rating }} / 5)
+    	</td>
+  	</tr>
+  	<tr>
+  		<td colspan="2">
+  		{% for set in changes %}
+  			{{ set.setname }}
+  			</br>
+  			{% for change in set.changes %}
+	  			{% if change.difference > 0 %}
+	  				+
+	  			{% endif %}
+	  			{{ change.difference }}
+
+  				{{ change.date }}
+  				</br>
+  			{% endfor %}
+  			</br>
+  		{% endfor %}
+  		</td>
+  	</tr>
+  	<tr>
+	  	<td colspan="2">
+	  		<a href="http://sales.starcitygames.com/search.php?substring={{ SpacelessName }}">Star City Games</a></br>
+	  		<a href="http://gatherer.wizards.com/Pages/Card/Details.aspx?name={{ SpacelessName }}">Gatherer</a></br>
+	  		<a href="http://magiccards.info/query?q={{ SpacelessName }}&v=card&s=cname">MagicCards.info</a></br>
+	  		<a href="http://www.cranialinsertion.com/archive?word={{ SpacelessName }}">Cranial Insertion Rules</a></br>
+	  		<a href="http://www.cranialinsertion.com/search?Name={{ SpacelessName }}">Cranial Insertion Search</a></br>
+	  		<a href="http://store.tcgplayer.com/magic/product/show?ProductName={{ SpacelessName }}">TCG Player</a>
+	  	</td>
+  	</tr>
+</table>

@@ -1,0 +1,9 @@
+syntax: glob
+*.jpg
+*.png
+*.pdn
+*.agif
+*.apng
+*.gif
+propel/
+images/

@@ -1,0 +1,325 @@
+.main
+{
+	/*width:70%;*/
+	/*text-align:center;*/
+	margin-left:auto;
+	margin-right:auto;
+	/*width:600px;*/
+	/*
+		width = 223 * 3 + padding * 2
+	*/
+	width:65%;
+	
+	min-width: 600px;
+	padding:10px;
+	border:5px solid gray;
+	background-color:#FFFFFF;
+}
+
+body
+{
+	background-color: #DCD9C8;
+	font-family: Trebuchet MS;
+}
+
+img
+{
+	border-width:0px;
+}
+
+table.SearchResultTable
+{
+	width:100%;
+}
+
+div.SearchResultLeftDiv
+{
+	overflow:auto;
+	height:400px;
+	/*width: 70%;/*600px*/
+	border-width:1px;
+	border-style:solid;
+	border-color:black;
+	padding:5px;
+}
+
+td.rightCardSearchTD
+{
+	vertical-align: top;
+	text-align: left;
+	width:223px;
+}
+
+div.SelectedCardExpansions
+{
+	overflow:auto;
+	width:200px;
+	height:100px;
+	/*width: 70%;/*600px*/
+	border-width:1px;
+	border-style:solid;
+	border-color:black;
+	text-align:left;
+}
+
+div.cardDetailsDiv
+{
+	vertical-align: top;
+	width:200px;
+}
+
+img.CardImageInWindow
+{
+	height:155px;
+	/*width:112px;*/
+}
+
+div.DeckCardDiv
+{
+	position: relative;
+	float:left;
+}
+div.DeckCardOverlay
+{
+	position:absolute;
+	z-index:1;
+	top:75px;
+	width:112px;
+	text-align:center;
+}
+
+input.addCardsInput
+{
+	width:380px;
+}
+div.cardSuggestionContainer
+{
+	position:absolute;
+	z-index:1;
+	width:380px;
+	background-color: #B7B7B7;
+	border: 1px solid #727272;
+	display:none;
+}
+
+select.setSuggestion
+{
+	width:380px;
+}
+
+.DeckOverlayText
+{
+	font-weight:bold;
+	font-size:24px;
+}
+
+.PositiveOverlayText
+{
+	color:#2B75FF;
+}
+.NegativeOverlayText
+{
+	color:#FF450C;
+}
+
+
+img.SelectedCardImg
+{
+	width:200px;
+	text-align:center;
+}
+
+div.banner
+{
+	text-align: center;
+}
+
+div.displayDivided
+{
+	padding: 50px;
+	min-height: 80px;
+	
+	padding: 3px;
+	vertical-align: top;
+	background: none repeat scroll 0 0 #FCE1B8;
+	border: 1px dotted #666666;
+	/*line-height: 16.8px;*/
+}
+
+.cardimage-standard
+{
+	/*height: 132px;*/
+	width: 92px;
+	padding: 3px;
+}
+
+.stdMiddleColumn
+{
+	font-size: 12.8px;
+	padding: 0px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+.StandardSetsColumn
+{
+	width: 15%;
+	text-align:center;
+}
+
+.EvenResultRow
+{
+	background-color:#f2f2f2;
+}
+
+.OddResultRow
+{
+	background-color:#ffffff;
+}
+
+.stdCardRow
+{
+	vertical-align: top;
+	border-collapse:collapse;
+}
+
+.TextManaSymbol
+{
+	height:15px;
+	vertical-align:bottom;
+}
+
+
+
+a.cardtitle
+{
+	color: Blue;
+	font-weight: bold;
+}
+
+.AdvSearchTextField
+{
+	width:186px;
+}
+
+.AdvSearchNumberField
+{
+	width:130px;
+}
+
+.AdvSearchParamHeader
+{
+	text-align:right;
+	font-weight:bold;
+}
+
+.AdvDropdownField
+{
+	width:186px;
+}
+
+.AdvSearchAllTable
+{
+	table-layout:fixed;
+	width:100%;
+}
+
+.AdvSearchParametersTD
+{
+	vertical-align:top;
+	/*width:100%;*/
+}
+
+
+div.UserBar
+{
+	padding: 50px;
+	min-height: 80px;
+	
+	padding: 3px;
+	vertical-align: top;
+	background: none repeat scroll 0 0 #F0E1B8;
+	border: 1px dotted #666666;
+}
+
+
+.image_top_left
+{
+	background-image: url("images/background_top_left.jpg");
+	background-repeat:repeat;
+	width:25px;
+	height:25px;
+	padding:0px;
+	margin:0px;
+}
+
+.image_top
+{
+	background-image: url("images/background_top_middle.jpg");
+	background-repeat:repeat;
+	height:25px;
+	padding:0px;
+	margin:0px;
+}
+
+.image_top_right
+{
+	background-image: url("images/background_top_right.jpg");
+	background-repeat:repeat;
+	width:25px;
+	height:25px;
+	padding:0px;
+	margin:0px;
+}
+
+.image_right
+{
+	background-image: url("images/background_middle_right.jpg");
+	background-repeat:repeat;
+	width:25px;
+	padding:0px;
+	margin:0px;
+}
+
+.image_bottom_left
+{
+	background-image: url("images/background_bottom_left.jpg");
+	background-repeat:repeat;
+	width:25px;
+	height:25px;
+	padding:0px;
+	margin:0px;
+}
+
+.image_bottom
+{
+	background-image: url("images/background_bottom_middle.jpg");
+	background-repeat:repeat;
+	height:25px;
+	padding:0px;
+	margin:0px;
+}
+
+.image_bottom_right
+{
+	background-image: url("images/background_bottom_right.jpg");
+	background-repeat:repeat;
+	width:25px;
+	height:25px;
+	padding:0px;
+	margin:0px;
+}
+
+.image_left
+{
+	background-image: url("images/background_middle_left.jpg");
+	background-repeat:repeat;
+	width:25px;
+	padding:0px;
+	margin:0px;
+}
+
+.maincell
+{
+	background-color: #FFFFFF;
+}

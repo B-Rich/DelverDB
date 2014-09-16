@@ -1,0 +1,21 @@
+{% if warnings|length > 0 %}
+	<p>Warnings</p>
+	<ol>
+	{% for warning in warnings %}
+		<li>{{ warning }}</li>
+	{% endfor %}
+	</ol>
+{% endif %}
+
+<p><a href='advsearch.php'>Back to Advanced Search</a></p>
+<p>{{ cardCount }} Card{% if cardCount > 1%}s{% endif %} Found</p>
+
+{% include "pages.twig" %}
+
+<table class='SearchResultTable'>
+{% for card in cards %}
+	{% include "standardresult.twig" %}
+{% endfor %}
+</table>
+<p><a href='advsearch.php'>Back to Advanced Search</a></p>
+{% include "pages.twig" %}

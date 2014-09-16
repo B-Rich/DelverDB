@@ -1,0 +1,20 @@
+<table>
+	<tr>
+		<th>#</th>
+		<th>Name</th>
+		<th></th>
+		<th>Date Created</th>
+		<th>Date Modified</th>
+		<th></th>
+	</tr>
+	{% for deck in decks %}
+	<tr>
+		<td>{{ deck.index }}</td>
+		<td>{{ deck.name }}</td>
+		<td><a href='deckmaker.php?edit={{ deck.id }}' >edit</a></td>
+		<td>{{ deck.datecreated }}</td>
+		<td>{{ deck.datemodified }}</td>
+		<td>
+	</tr>
+	{% endfor %}
+</table>

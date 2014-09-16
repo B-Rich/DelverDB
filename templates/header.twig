@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<title>{{title}}</title>
+	<link rel="shortcut icon" href="images/ddb.ico" />
+	<link rel="stylesheet" type="text/css" href="mtg_db.css" />
+	<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+	<!-- <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.js" ></script> -->
+	<script type="text/javascript" src="login.js" ></script>
+	{% autoescape false %}
+	{% for script in scripts %}
+	{{ script }}
+	{% endfor %}
+	{% endautoescape %}
+</head>
+<body>
+<div class = "main">
+<div class="banner">
+	<a href="index.php"><img src="images/banner4.png" alt="DelverDB" /></a>
+</div>
+<div>
+	<a href='index.php'>Home</a>
+	<a href='advsearch.php'>Advanced Search</a>
+	<a href='simplesearch.php'>Simple Search</a>
+	<a href='deckmaker.php'>Make a Deck</a>
+	{%
+	if isloggedin
+	%}
+	<a href='mydecks.php'>My Decklists</a>
+	<a href='addcards.php'>Add Cards</a>
+	<a href='linkcheck.php'>Link Check</a>
+	<a href='cardchanges.php'>Card Changes</a>
+	{%
+	endif
+	%}
+</div>
+
+{% include "userbar.twig" %}
+
+<h1>{{heading}}</h1>
+	

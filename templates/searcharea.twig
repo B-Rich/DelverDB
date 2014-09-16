@@ -1,0 +1,95 @@
+
+<table>
+	<tr>
+		<td>
+			<input type="button" value="Search" onclick="SendSearchRequest()" />
+			<input type="text" id="textfield" />
+			
+			<label>Name<input type="checkbox" id="Namecheckbox" checked="checked" /></label>
+			<label>Types<input type="checkbox" id="Typescheckbox" /></label>
+			<label>Rules<input type="checkbox" id="Rulescheckbox" /></label>
+		</td>
+		<td rowspan="5">
+			<select id='expansionfield' multiple="multiple" size="8">
+				{% for block in blocks%}
+					<optgroup label="{{ block.name }}">
+					{% for set in block.sets|reverse %}
+						<option value="{{ set.setcode }}">{{ set.name }}</option>
+					{% endfor %}
+					</optgroup>
+				{% endfor %}
+			</select>
+			<input type="button" value="Clear Sets" onclick="ResetSetSelector()" />
+			<input type="button" value="Reset" onclick="ResetSearchFields()" />
+		</td>
+	</tr>
+	<tr>
+		<td>
+		Types: &nbsp;&nbsp;
+		<input type="button" value="->" onclick="ToggleCheckboxes(
+		{% for type in types %}
+			'{{ type }}'
+			{% if not loop.last %}
+				, 
+			{% endif %}
+		{% endfor %}
+		)" />
+		
+		{% for type in types%}
+			<label title="{{ type }}">
+				<input type="checkbox" id="{{ type }}checkbox" checked="checked" />
+				<img src="images/{{ type }}.jpg" alt="{{ type }}" />
+			</label>
+		{% endfor %}
+		</td>
+	</tr>
+	<tr>
+		<td>
+		Colours: 
+		<input type="button" value="->" onclick="ToggleCheckboxes(
+		{% for colour in colours %}
+			'{{ colour.name }}'
+			{% if not loop.last %}
+				, 
+			{% endif %}
+		{% endfor %}
+		)" />
+		
+		{% for colour in colours %}
+			<label title="{{ colour.name }}">
+				<input type="checkbox" id="{{ colour.name }}checkbox" checked="checked" />
+				<img src="images/{{ colour.symbol }}.png" alt="{{ colour.symbol }}" />
+			</label>
+		{% endfor %}
+		</td>
+	</tr>
+	<tr>
+		<td>
+		Rarities: 
+		<input type="button" value="->" onclick="ToggleCheckboxes(
+		{% for rarity in rarities %}
+			'{{ rarity.name }}'
+			{% if not loop.last %}
+				, 
+			{% endif %}
+		{% endfor %}
+		)" />
+		
+		{% for rarity in rarities %}
+			<label title="{{ rarity.name }}">
+				<input type="checkbox" id="{{ rarity.name }}checkbox" checked="checked" />
+				 <img src="images/exp/V11_{{ rarity.symbol }}_small.jpg" alt="{{ rarity.name }}" />
+			</label> &nbsp;
+		{% endfor %}
+		</td>
+	</tr>
+	<tr>
+		<td>
+		{% if isloggedin %}
+		<label title="Filter My Cards">My Cards Only:
+			 <input type="checkbox" id="MyCardscheckbox" />
+		</label>
+		{% endif %}
+		</td>
+	</tr>
+</table>

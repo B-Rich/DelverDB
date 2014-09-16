@@ -1,0 +1,37 @@
+
+<table class="SearchResultTable">
+	<tr>
+		<td>
+			<div id="numCardsFoundDiv">0 Cards Found</div>
+			<div id="CardsInDeckDiv">0 Cards in Deck</div>
+			<div id="searchResultDiv" class="SearchResultLeftDiv"></div>
+		</td>
+		<td class="rightCardSearchTD">
+			<div id="cardDetailsDiv">
+				<img src="images/cardback.jpg" class="SelectedCardImg"
+					id="SelectedCardImg" />
+				<div id="CardDeckInfoDiv">No Card Selected</div>
+			</div>
+		</td>
+	</tr>
+<tr>
+<td>
+
+<div id="DeckContentsDiv" class="SearchResultLeftDiv"></div> 
+</td>
+<td>
+{% if isloggedin %}
+	Deckname:
+	<input type="text" id="DeckName" {% if useexistingdeck %}value="{{ deckname }}" {% endif %}/>
+	<input type="button" value="Create New Deck" onclick="javascript:SaveDeck(false)"/>
+	
+	{% if useexistingdeck %}
+		</br>
+		<input type="button" value="Save Changes" onclick="javascript:SaveDeck(true)"/>
+	{% endif %}
+	</br>
+	<div id="DeckMessages"></div>
+{% endif %}
+</td>
+</tr>
+</table>

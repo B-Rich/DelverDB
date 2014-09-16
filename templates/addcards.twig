@@ -1,0 +1,33 @@
+<h2>Singles</h2>
+<table>
+	<tr>
+		<td>
+			Count:<input type="text" name="cardcount" id="CardCount" class="addCardsInput"/>
+			</br>
+			Name:<input type="text" name="cardname" id="CardName" class="addCardsInput"/>
+			</br>
+			<div class="cardSuggestionContainer" id="cardSuggestionBox">foobar</div>
+			<!-- Set:
+			<select name="setcode" id="CardSet" >
+				<option value=''>&nbsp;</option>
+				{% for block in blocks%}
+					<optgroup label="{{ block.name }}">
+					{% for set in  block.sets %}
+						<option value="{{ set.setcode }}">{{ set.name }}</option>
+					{% endfor %}
+					</optgroup>
+				{% endfor %}
+			</select>
+			-->
+			<input type="button" onclick="javascript:SingleCardSubmit()" value="Add" />
+		</td>
+		
+		<td>
+			Set:
+			</br>
+			<select id='setSuggestions' class='setSuggestion' multiple="multiple">
+			</select>
+		</td>
+	</tr>
+</table>
+<div id="MessageBox"></div>

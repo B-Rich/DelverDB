@@ -1,0 +1,74 @@
+<tr class='stdCardRow {% if evenrow %} EvenResultRow {% else %} OddResultRow {% endif %}'>	
+<td>
+	{# <a href="{{ card.imageurl|raw }}" > #}
+	<a target='_blank' href="carddetails.php?id={{ card.id }}&amp;set={{ card.sets[0].code }}" >
+		<img src="{{ card.imageurl|raw }}" alt="{{ card.name }}" class = 'cardimage-standard'/>
+	</a>
+</td>
+<td class='stdMiddleColumn' >
+	<a class='cardtitle' target='_blank' href="carddetails.php?id={{ card.id }}&amp;set={{ card.sets[0].code }}" >
+		{{ card.name|raw }}
+	</a>
+	{% autoescape false %}{{ card.cost}} {% endautoescape %} ({{ card.cmc }}) 
+	
+	{% spaceless %}
+	{% for i in 0..4 %}
+	 	{% if card.ratingStars >= i + 1 %}
+			<img src="images/icons/star_full_32.png" class='TextManaSymbol'/>
+		{% elseif (card.ratingStars - i) >=  0.5 %}
+			<img src="images/icons/star_half_32.png" class='TextManaSymbol'/>
+		{% else %}
+			<img src="images/icons/star_empty_32.png" class='TextManaSymbol'/>
+		{% endif %}
+	{% endfor %}
+	{% endspaceless %}
+	({{ card.rating }})
+	
+	
+	</br>
+	{{ card.type }}
+	{% if card.subtype %}
+		&mdash; {{ card.subtype }}
+	{% endif %}
+	{% if card.power is not null and card.toughness is not null %}
+		({{ card.power }}/{{ card.toughness }})
+	{% elseif card.loyalty is not null %}
+		({{ card.loyalty }})
+	{% elseif card.handmod and card.lifemod %}
+		({{ card.handmod }}/{{ card.lifemod }})
+	{% endif %}
+	</br>
+	{% if card.rules %}
+		{% autoescape false %} {{ card.rules|raw }}{% endautoescape %}
+	{% endif %}
+</td>
+<td class='StandardSetsColumn'>
+{% if showOwnerships %}
+	<b>Total: {{ card.total }}</b>
+	<hr>
+{% endif %}
+{% for set in card.sets %}
+{#
+	<a href="{{ set.imageurl|raw }}">
+	<img src="{{ set.symbolurl }}" alt="{{ set.code }}"
+	{% if showownerships %}
+		title="{{ set.name }}: {{ set.count }}"
+	{% endif %}
+	/></a>
+	#}
+	{% spaceless %}
+	{% if showOwnerships %}
+		{{ set.count }}x
+	{% endif %}
+	<a target='_blank' href="carddetails.php?id={{card.id}}&amp;set={{set.code}}" >
+		<img src="{{ set.symbolurl }}" alt="{{ set.code }}"
+		title="{{ set.name }}"/>
+	</a>
+	{% endspaceless %}
+	{% if showOwnerships and card.sets|length <= 5 %}
+		</br>
+	{% endif %}
+	
+{% endfor %}
+</td>	
+</tr>

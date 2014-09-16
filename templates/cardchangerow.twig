@@ -1,0 +1,15 @@
+<tr>
+	<!-- <td>{{ change.index }} -->
+	<td>
+		{% if change.difference > 0 %}
+		+
+		{% endif %}
+		{{ change.difference }}
+	</td>
+	<td>
+		<a href="carddetails.php?id={{ change.cardID }}&set={{change.setcode }}">
+		{{ change.name|raw }}
+		</a>
+	</td>
+	<td>{{ change.dateModified }}</td>
+</tr>
