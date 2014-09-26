@@ -4,7 +4,7 @@ var nameSuggestionIndex = -1;
 $(document).ready(function()
 {
 	"use strict";
-	$("#CardName, #CardCount, #CardSet. #setSuggestions").keydown( function(event)
+	$("#CardName #CardCount #CardSet #setSuggestions").keydown( function(event)
 	{ 
 		"use strict";
 		if(event.which == 13)

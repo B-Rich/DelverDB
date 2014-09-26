@@ -408,7 +408,7 @@ function AppendRarityQuery()
 		}
 	}
 
-	$RarityQuery .= " ) ";
+	$RarityQuery .= " OR cardsets.rarity = 'S' ) ";
 	if($AllRaritysSelected)
 	{
 		$QueryString .= " TRUE ";
