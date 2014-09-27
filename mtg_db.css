@@ -323,3 +323,20 @@ div.UserBar
 {
 	background-color: #FFFFFF;
 }
+
+.tag
+{
+    background-color: rgb( 11, 109, 168 );
+    border-radius: 2px;
+    box-shadow: none;
+    color: #5ed7ff;
+    display: inline-block;
+    line-height: 19px;
+    margin-bottom: 3px;
+    margin-right: 2px;
+    max-width: 200px;
+    overflow: hidden;
+    padding: 0 7px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

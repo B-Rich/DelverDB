@@ -25,6 +25,7 @@ class Card
 	public $total;
 
 	public $sets = array();
+	public $tags = array();
 
 	public function ConstructFromResults( $cardRow )
 	{

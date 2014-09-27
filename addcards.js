@@ -13,17 +13,15 @@ $(document).ready(function()
 			return;
 		}
 		
-		if(event.which == 40) // down
+		if ( event.which == 40 ) // down
 		{
 			nameSuggestionIndex = nameSuggestionIndex >= 4 ? 4 : nameSuggestionIndex + 1;
 		}
 		
-		if(event.which == 38) // up
+		if ( event.which == 38 ) // up
 		{
 			nameSuggestionIndex = nameSuggestionIndex <= 0 ? 0 : nameSuggestionIndex - 1;
 		}
-		
-		
 	});
 	
 	$("#CardName").keyup(function(event)
@@ -67,7 +65,7 @@ function SingleCardSubmit()
 		$("#MessageBox").html("Invalid name");
 		return;
 	}
-	var setcode = $("#setSuggestions").val();//$("#CardSet").val();
+	var setcode = $("#setSuggestions").val();
 	if(setcode == undefined)
 	{
 		$("#MessageBox").html("Invalid setcode");
@@ -257,7 +255,6 @@ function DisplaySetSuggestions()
 function SetNameField(_name)
 {
 	"use strict";
-	//alert(_name);
 	$("#cardSuggestionBox").html("");
 	$("#CardName").val(_name);
 	$("#cardSuggestionBox").hide();

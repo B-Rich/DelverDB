@@ -156,6 +156,9 @@ Defines::$SetcodeOrder = array(
 	'VMA',
 	'CNS',
 	'M15',
+	'V14',
+	'DDM',
+	'KTK',
 );
 
 Defines::$SetcodeToIndices = array_flip(Defines::$SetcodeOrder);
@@ -291,11 +294,15 @@ Defines::$SetCodeToNameMap = array(
 	'VMA' => "Vintage Masters",
 	'CNS' => "Conspiracy",
 	'M15' => "Magic 2015",
+	'V14' => "From the Vaults: Annihilation",
+	'DDM' => "Duel Decks: Speed vs. Cunning",
+	'KTK' => "Khans of Tarkir",
 );
 
 Defines::$SetNameToCodeMap = array_flip(Defines::$SetCodeToNameMap);
 
 Defines::$CardBlocksToSetCodes = array(
+	"Khans Block"				=> array( 'KTK', ),
 	"Theros Block"				=> array( 'THS', 'BNG', 'JOU', ),
 	"Return to Ravnica Block"	=> array( 'RTR', 'GTC', 'DGM', ),
 	"Innistrad Block"			=> array( 'ISD', 'DKA', 'AVR', ),
@@ -319,7 +326,7 @@ Defines::$CardBlocksToSetCodes = array(
 	"Early Expansions"			=> array( 'ARN', 'ATQ', 'LEG', 'DRK', 'FEM', ),
 	"Core Sets"					=> array( 'LEA', 'LEB', '2ED', '3ED', '4ED', '5ED', '6ED', '7ED', '8ED', '9ED', '10E', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15', ),
 	"Duel Decks"				=> array( 'EVG', 'DD2', 'DDC', 'DDD', 'DDE', 'DDF', 'DDG', 'DDH', 'DDI', 'DDJ', 'DDK', 'DDL', 'DDM', ),
-	"From the Vault"			=> array( 'DRB', 'V09', 'V10', 'V11', 'V12', ),
+	"From the Vault"			=> array( 'DRB', 'V09', 'V10', 'V11', 'V12', 'V13', ),
 	"Un- Sets"					=> array( 'UGL', 'UNH', ),
 	"Portal / Starter Sets"		=> array( 'POR', 'P02', 'PTK', 'S99', 'S00', ),
 	"Casual Supplements"		=> array( 'VAN', 'HOP', 'ARC', 'CMD', 'PC2', 'C13', 'CNS', ),
@@ -329,9 +336,9 @@ Defines::$CardBlocksToSetCodes = array(
 
 
 Defines::$CardFormats = array(
-	"Standard"					=> array("RTR", "GTC", 'DGM', 'M14', 'THS', 'BNG', 'JOU', 'M15', ),
+	"Standard"					=> array( 'THS', 'BNG', 'JOU', 'M15', 'KTK', ),
 	"Extended"					=> array("SOM", "MBS", "NPH", "M12", "ISD", "DKA", "AVR", "M13", "RTR", "GTC", 'DGM', 'M14', 'THS', 'BNG', 'JOU', 'M15', ),
-	"Modern"					=> array("8ED", "MRD", "DST", "5DN", "CHK", "BOK", "SOK", "9ED", "RAV", "GPT", "DIS", "CSP", "TSP", "TSB", "PLC", "FUT", "10E", "LRW", "MOR", "SHM", "EVE", "ALA", "CON", "ARB", "M10", "ZEN", "WWK", "ROE", "M11", "SOM", "MBS", "NPH", "M12", "ISD", "DKA", "AVR", "M13", "RTR", "GTC", 'DGM', 'M14', 'THS', 'BNG', 'JOU', 'M15', ),
+	"Modern"					=> array("8ED", "MRD", "DST", "5DN", "CHK", "BOK", "SOK", "9ED", "RAV", "GPT", "DIS", "CSP", "TSP", "TSB", "PLC", "FUT", "10E", "LRW", "MOR", "SHM", "EVE", "ALA", "CON", "ARB", "M10", "ZEN", "WWK", "ROE", "M11", "SOM", "MBS", "NPH", "M12", "ISD", "DKA", "AVR", "M13", "RTR", "GTC", 'DGM', 'M14', 'THS', 'BNG', 'JOU', 'M15', 'KTK', ),
 	"Core Sets"					=> array('LEA', 'LEB', '2ED', '3ED', '4ED', '5ED', '6ED', '7ED', '8ED', '9ED', '10E', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15', ),
 	"Ice Age Block"				=> array("ICE", "ALL", "CSP" ),
 	"Innistrad Block"			=> array("ISD", "DKA", "AVR" ),

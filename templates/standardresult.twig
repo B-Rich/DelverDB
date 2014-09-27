@@ -41,6 +41,34 @@
 	{% if card.rules %}
 		{% autoescape false %} {{ card.rules|raw }}{% endautoescape %}
 	{% endif %}
+	</br>
+	
+	{% spaceless %}
+	<a href="javascript:void()"
+		onclick="onShowTagField({{ card.id }})" >
+		<img src="images/tag_small.png"alt="Add Tag" style="vertical-align:bottom" />
+	</a>
+	{% endspaceless %}
+	
+	<span id="tag_input_{{ card.id }}" style="display:none" >
+		<select id="add_tag_{{ card.id }}">
+		{% for tag in tags %}
+			<option value="{{ tag.id }}" >{{ tag.name }}</option>
+		{% endfor %}
+		</select>
+		<input type="button" value="Add" onclick="javascript:onAddTag( {{ card.id}} )" />
+		
+		<input type="text" size="15" id="tag_name_{{ card.id }}" />
+		<input type="button" value="Create" onclick="javascript:onCreateTag({{ card.id }})" />
+	</span>
+	
+	{% for tag in card.tags %}
+		<span class="tag">{{ tag.name }}
+			<a href="javascript:void()" onclick="javascript:onRemoveTag( {{ card.id }}, {{ tag.id }} )" >
+				<img alt="x" src="images/remove_x.png" />
+			</a>
+		</span>
+	{% endfor %}
 </td>
 <td class='StandardSetsColumn'>
 {% if showOwnerships %}
@@ -48,14 +76,6 @@
 	<hr>
 {% endif %}
 {% for set in card.sets %}
-{#
-	<a href="{{ set.imageurl|raw }}">
-	<img src="{{ set.symbolurl }}" alt="{{ set.code }}"
-	{% if showownerships %}
-		title="{{ set.name }}: {{ set.count }}"
-	{% endif %}
-	/></a>
-	#}
 	{% spaceless %}
 	{% if showOwnerships %}
 		{{ set.count }}x

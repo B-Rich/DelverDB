@@ -27,6 +27,7 @@ $args = array();
 $args["title"] = "Results - DDB";
 $args["heading"] = "Advanced Search Results";
 $args['isloggedin'] = $IsLoggedIn;
+$args['scripts'][] = "<script type='text/javascript' src='js/advresults.js' ></script>";
 
 if ( $LoginErrorMessage != null )
 {
@@ -217,6 +218,10 @@ $TemplateArgs['cardCount'] = $CardCount;
 
 $OracleDataStmt = $DelverDBLink->prepare( "SELECT * FROM oracle WHERE cardid = ?");
 $CardSetStmt = $DelverDBLink->prepare( "SELECT setcode, rarity, cnum, artist FROM cardsets WHERE cardid = ?");
+$CardTagStmt = $DelverDBLink->prepare( "SELECT tags.name, taglinks.tagid FROM taglinks
+		INNER JOIN tags ON taglinks.tagid = tags.uid 
+		WHERE taglinks.cardid = ?" );
+$TagListStmt = $DelverDBLink->prepare( "SELECT uid, name FROM tags" );
 
 $MyCardsOnly = ( IsLoggedIn() && array_key_exists('mycards', $_GET) && $_GET['mycards'] != '0' );
 
@@ -253,9 +258,6 @@ for ( $CardIndex = 0; $CardIndex < $CardCount; ++$CardIndex )
 	$oracleResult = $OracleDataStmt->get_result();
 	$oracleRow = $oracleResult->fetch_assoc();
 	
-	$completeCard = new Card();
-	$completeCard->ConstructFromResults( $oracleRow );
-	
 	$ownershipArray = null;
 	if ( $IsLoggedIn == true )
 	{
@@ -277,10 +279,14 @@ for ( $CardIndex = 0; $CardIndex < $CardCount; ++$CardIndex )
 		
 		if ( $MyCardsOnly == true && count( $ownershipArray ) == 0 )
 		{
+			// Ignore this card, and move on
 			continue;
 		}
 		
 	}
+	
+	$completeCard = new Card();
+	$completeCard->ConstructFromResults( $oracleRow );
 	
 	$CardSetStmt->bind_param( 'i', $cardID );
 	$CardSetStmt->execute();
@@ -307,7 +313,16 @@ for ( $CardIndex = 0; $CardIndex < $CardCount; ++$CardIndex )
 	}
 	$completeCard->imageurl = $completeCard->GetFirstImageURL();
 	
-	$completeCard->ratingStars = round($completeCard->rating * 2.0) / 2;
+	$completeCard->ratingStars = round( $completeCard->rating * 2.0 ) / 2;
+	
+	$CardTagStmt->bind_param( "i", $cardID );
+	$CardTagStmt->execute();
+	$cardTagResults = $CardTagStmt->get_result();
+	while ( $tagRow = $cardTagResults->fetch_assoc() )
+	{
+		print ( "Tag name " + $tagRow['name'] );
+		$completeCard->tags[] = array( "id" => $tagRow['tagid'], "name" => $tagRow['name'] );
+	}
 	
 	$TemplateArgs['cards'][] = $completeCard;
 	
@@ -316,6 +331,14 @@ for ( $CardIndex = 0; $CardIndex < $CardCount; ++$CardIndex )
 	{
 		break;
 	}
+}
+
+$TagListStmt->execute();
+$TagListResult = $TagListStmt->get_result();
+$TemplateArgs['tags'] = array();
+while ( $row = $TagListResult->fetch_assoc() )
+{
+	$TemplateArgs['tags'][] = array( "id" => $row['uid'], "name" => $row['name'] );
 }
 
 $TwigTemplate = $twig->loadTemplate( 'advresults.twig' );

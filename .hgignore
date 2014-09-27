@@ -7,3 +7,4 @@ syntax: glob
 *.gif
 propel/
 images/
+passwords.php
