@@ -157,7 +157,7 @@ Defines::$SetcodeOrder = array(
 	'CNS',
 	'M15',
 	'V14',
-	'DDM',
+	'DDN',
 	'KTK',
 );
 
@@ -295,7 +295,7 @@ Defines::$SetCodeToNameMap = array(
 	'CNS' => "Conspiracy",
 	'M15' => "Magic 2015",
 	'V14' => "From the Vaults: Annihilation",
-	'DDM' => "Duel Decks: Speed vs. Cunning",
+	'DDN' => "Duel Decks: Speed vs. Cunning",
 	'KTK' => "Khans of Tarkir",
 );
 
@@ -325,7 +325,7 @@ Defines::$CardBlocksToSetCodes = array(
 	"Ice Age Block"				=> array( 'ICE', 'ALL', 'CSP', ),
 	"Early Expansions"			=> array( 'ARN', 'ATQ', 'LEG', 'DRK', 'FEM', ),
 	"Core Sets"					=> array( 'LEA', 'LEB', '2ED', '3ED', '4ED', '5ED', '6ED', '7ED', '8ED', '9ED', '10E', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15', ),
-	"Duel Decks"				=> array( 'EVG', 'DD2', 'DDC', 'DDD', 'DDE', 'DDF', 'DDG', 'DDH', 'DDI', 'DDJ', 'DDK', 'DDL', 'DDM', ),
+	"Duel Decks"				=> array( 'EVG', 'DD2', 'DDC', 'DDD', 'DDE', 'DDF', 'DDG', 'DDH', 'DDI', 'DDJ', 'DDK', 'DDL', 'DDM', 'DDN', ),
 	"From the Vault"			=> array( 'DRB', 'V09', 'V10', 'V11', 'V12', 'V13', ),
 	"Un- Sets"					=> array( 'UGL', 'UNH', ),
 	"Portal / Starter Sets"		=> array( 'POR', 'P02', 'PTK', 'S99', 'S00', ),

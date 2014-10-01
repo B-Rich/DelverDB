@@ -210,9 +210,11 @@ exit;
 function AppendTextQuery()
 {
 	global $QueryString, $QueryStack, $QueryFormat;
+	
+	$QueryString .= " ( ";
 	if ( !array_key_exists('text', $_GET) )
 	{
-		$QueryString .= " TRUE ";
+		$QueryString .= " TRUE )";
 		return;
 	}
 	
@@ -260,6 +262,7 @@ function AppendTextQuery()
 		array_push( $QueryStack, $text );
 		array_push( $QueryFormat,'s' );
 	}
+	$QueryString .= " ) ";
 }
 
 function AppendTypeQuery()
