@@ -435,9 +435,9 @@ function AppendSetQuery()
 	}
 	$first = true;
 	$SetQuery = " ( ";
-	foreach($_GET['set'] as $index => $setcode)
+	foreach ( $_GET['set'] as $index => $setcode )
 	{
-		if(array_key_exists($setcode, Defines::$SetCodeToNameMap))
+		if ( array_key_exists( $setcode, Defines::$SetCodeToNameMap ) )
 		{
 			if(!$first)
 			{

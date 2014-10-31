@@ -4,21 +4,21 @@ var nameSuggestionIndex = -1;
 $(document).ready(function()
 {
 	"use strict";
-	$("#CardName #CardCount #CardSet #setSuggestions").keydown( function(event)
+	//$("#CardName #CardCount #CardSet #setSuggestions").keydown( function(event)
+	$("body").keydown( function(event)
 	{ 
 		"use strict";
 		if(event.which == 13)
 		{
 			SingleCardSubmit();
+			
 			return;
 		}
-		
-		if ( event.which == 40 ) // down
+		else if ( event.which == 40 ) // down
 		{
 			nameSuggestionIndex = nameSuggestionIndex >= 4 ? 4 : nameSuggestionIndex + 1;
 		}
-		
-		if ( event.which == 38 ) // up
+		else if ( event.which == 38 ) // up
 		{
 			nameSuggestionIndex = nameSuggestionIndex <= 0 ? 0 : nameSuggestionIndex - 1;
 		}
@@ -116,6 +116,9 @@ function SingleCardSubmit()
 	//alert(url);
 	xmlhttp.open("GET", url, true);
 	xmlhttp.send();
+	
+	$("#cardSuggestionBox").hide();
+	$("#setSuggestions").html("");
 }
 
 function DisplayCardNameSuggestions()

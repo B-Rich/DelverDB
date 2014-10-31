@@ -139,9 +139,11 @@ $UserCardCountArray = array();
 if ( $IsCardCountSearch )
 {
 	// Use the old query to find how many of each card ID teh user owns
-	$newOwnershipStmt = $DelverDBLink->prepare( "SELECT cardid, count FROM usercards
+	$query = "SELECT cardid, count FROM usercards
 			WHERE ownerid = 1 AND cardid
-			IN ( SELECT DISTINCT oracle.cardid $QueryString ) ORDER BY cardid" );
+			IN ( SELECT DISTINCT oracle.cardid $QueryString ) ORDER BY cardid";
+	$SearchLog->log( "Searching " . $query );
+	$newOwnershipStmt = $DelverDBLink->prepare( $query );
 	if ( $newOwnershipStmt == null )
 	{
 		$DBLog->err( "Error preparing CardOwnershipStmt " . $DelverDBLink->error );

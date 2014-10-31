@@ -21,19 +21,6 @@ function splitstring(str)
     return pieces;
 }
 
-
-
-function escapeHtml(text) 
-{
-  return text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;")
-      .replace(/\//g, "&#47");
-}
-
 function GetSetIconURL(_setcode, _rarity)
 {
 	"use strict";
@@ -43,5 +30,8 @@ function GetSetIconURL(_setcode, _rarity)
 function GetCardImageFilename( _cardname, _setcode )
 {
 	"use strict";
-	return "images/cardpic/_"+_setcode+'/'+_cardname.replace(':', '').replace('"', '')+".jpg"
+	_cardname = encodeURI( _cardname );
+	var str = "images/cardpic/_"+_setcode+'/'+_cardname.replace(':', '').replace('"', '')+".jpg";
+	//alert( str );
+	return str;
 }

@@ -149,12 +149,10 @@ function SendSearchRequest()
 			alert("Could not find checkbox named \""+cbName+"checkbox\"");
 			continue;
 		}
-		//alert( cbName + " is " + )
+		
 		if ( $("#"+cbName+"checkbox").prop('checked') )
 		{
-			//alert( cbName + " is checked" )
 			parameters[cbName] = 1;
-			//$("#"+cbName+"checkbox").hide();
 		}
 	}
 	
@@ -261,7 +259,6 @@ function SendSearchRequest()
 	}
 	url += "?" + postData
 	
-	//alert(url);
 	xmlhttp.open("GET", url, true);
 	xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 	xmlhttp.send();
@@ -274,8 +271,7 @@ function DisplaySearchResults()
 	for(var cardid in CardResults)
 	{
 		var setcode = CardResults[cardid].GetFirstSetcode();
-		var cardname = CardResults[cardid].name
-		
+		var cardname = CardResults[cardid].name;
 		
 		var html = '<img src="' + GetCardImageFilename( cardname, setcode ) + '"\
 			alt="'+cardname+'" \
@@ -283,15 +279,15 @@ function DisplaySearchResults()
 			title="'+cardname+'" \
 			onclick="SelectSearchCard('+cardid+')" /> ';
 		
-		$("#searchResultDiv").append(html);
+		$("#searchResultDiv").append( html );
 	}
 }
 
-function SelectSearchCard(_cardid)
+function SelectSearchCard( _cardid )
 {
 	"use strict";
 	SelectedCardID = _cardid;
-	if(!(_cardid in CardResults))
+	if ( !(_cardid in CardResults) )
 	{
 		DisplayMessage("Cannot find card with ID: "+_cardid);
 		return;
@@ -299,15 +295,15 @@ function SelectSearchCard(_cardid)
 	
 	var card = CardResults[_cardid];
 	var cardname = card.name;
-	if(card.sets.length == 0)
+	if ( card.sets.length == 0 )
 	{
-		DisplayMessage(cardname + " does not have any set information attached.");
+		DisplayMessage( cardname + " does not have any set information attached." );
 		return;
 	}
 	
 	var setcode = card.GetFirstSetcode();
-	ChangeSetOfCardPreview(setcode);
-	if(PageMode == "Search")
+	ChangeSetOfCardPreview( setcode );
+	if ( PageMode == "Search" )
 	{
 		DisplayCardSets();
 	}
@@ -409,7 +405,6 @@ function ChangeSetOfCardPreview( _setcode )
 	else if(PageMode == "CreateDeck" && SelectedCardID in DeckContents)
 	{
 		cardname = DeckContents[SelectedCardID].name;
-		
 	}
 	else
 	{
@@ -419,8 +414,10 @@ function ChangeSetOfCardPreview( _setcode )
 	}
 	$("#SelectedCardLink").prop('href', 
 			'carddetails.php?id=' + SelectedCardID + "&set=" + _setcode );
+	
 	var imgurl = GetCardImageFilename( cardname, _setcode );
-	$("#SelectedCardImg").prop("src", imgurl );
+	imgurl = $("<div/>").html(imgurl).text();
+	$("#SelectedCardImg").prop( "src", imgurl );
 }
 
 function SendCardChangeRequest(_cardid, _setcode, _count)

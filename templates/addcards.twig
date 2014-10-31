@@ -1,33 +1,23 @@
 <h2>Singles</h2>
 <table>
 	<tr>
+		<td>Count:</td>
 		<td>
-			Count:<input type="text" name="cardcount" id="CardCount" class="addCardsInput"/>
-			</br>
-			Name:<input type="text" name="cardname" id="CardName" class="addCardsInput"/>
-			</br>
-			<div class="cardSuggestionContainer" id="cardSuggestionBox">foobar</div>
-			<!-- Set:
-			<select name="setcode" id="CardSet" >
-				<option value=''>&nbsp;</option>
-				{% for block in blocks%}
-					<optgroup label="{{ block.name }}">
-					{% for set in  block.sets %}
-						<option value="{{ set.setcode }}">{{ set.name }}</option>
-					{% endfor %}
-					</optgroup>
-				{% endfor %}
-			</select>
-			-->
-			<input type="button" onclick="javascript:SingleCardSubmit()" value="Add" />
+			<input type="text" name="cardcount" id="CardCount" class="addCardsInput" tabindex="1" />
 		</td>
-		
+		<td rowspan="2">
+			<select id='setSuggestions' class='setSuggestion' multiple="multiple"></select>
+		</td>
+	</tr>
+	<tr>
 		<td>
-			Set:
-			</br>
-			<select id='setSuggestions' class='setSuggestion' multiple="multiple">
-			</select>
+			Name:
+		</td>
+		<td>
+			<input type="text" name="cardname" id="CardName" class="addCardsInput" tabindex="2"/>
+			<div class="cardSuggestionContainer" id="cardSuggestionBox">foobar</div>
 		</td>
 	</tr>
 </table>
+<input type="button" onclick="javascript:SingleCardSubmit()" value="Add" />
 <div id="MessageBox"></div>
