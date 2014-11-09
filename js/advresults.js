@@ -25,13 +25,21 @@ function onAddTag( _cardID )
 			var errno = attrs.getNamedItem( 'errno' ).value;
 			var message = response.childNodes[0].data;
 			
+			var tagname = attrs.getNamedItem( 'tagname' ).value;
+			
 			if ( errno > 0 )
 			{
-				window.location.reload();
+				//TODO: FOOBAR
+				//window.location.reload();
+				$("#tagList_" + _cardID ).append( 
+				"<span class='tag'>" + tagname +
+				"<a href='javascript:void()'" +
+				" onclick='javascript:onRemoveTag( " + _cardID + ", " + tagID +" )' >" +
+				"<img alt='x' src='images/remove_x.png' />" +
+				"</a> </span>" );
 			}
 		}
 	}
-	
 	xmlhttp.open( "GET", url, true );
 	xmlhttp.send();
 }

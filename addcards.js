@@ -4,7 +4,6 @@ var nameSuggestionIndex = -1;
 $(document).ready(function()
 {
 	"use strict";
-	//$("#CardName #CardCount #CardSet #setSuggestions").keydown( function(event)
 	$("body").keydown( function(event)
 	{ 
 		"use strict";
@@ -27,7 +26,6 @@ $(document).ready(function()
 	$("#CardName").keyup(function(event)
 	{
 		"use strict";
-		//if(event.which != 40 && event.which != 38)
 		DisplayCardNameSuggestions();
 	}
 	)
@@ -78,6 +76,21 @@ function SingleCardSubmit()
 		return;
 	}
 	
+	$("#MessageBox").html( "" );
+	SendCardAJAX( count, name, setcode );
+	
+	/// Reset fields, focus on count field
+	$("#CardCount").val("");
+	$("#CardName").val("");
+	$("#CardCount").focus();
+	
+	$("#cardSuggestionBox").hide();
+	$("#setSuggestions").html("");
+}
+
+function SendCardAJAX( _count, _name, _setcode )
+{
+	"use strict";
 	var xmlhttp;
 	if (window.XMLHttpRequest)
 	{// code for IE7+, Firefox, Chrome, Opera, Safari
@@ -88,7 +101,7 @@ function SingleCardSubmit()
 		xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
 	}
 	
-	var url = "usercardsajax.php?count="+count+"&cardname="+name+"&setcode="+setcode;
+	var url = "usercardsajax.php?count="+_count+"&cardname="+_name+"&setcode="+_setcode;
 	
 	/// AJAX
 	xmlhttp.onreadystatechange = function()
@@ -101,24 +114,18 @@ function SingleCardSubmit()
 			var attrs = response.attributes;
 			var errno = attrs.getNamedItem('errno').value;
 			var message = response.childNodes[0].data;
-			$("#MessageBox").html(message);
-			if(errno != 0)
+			$("#MessageBox").append( message + "</br>" );
+			if ( errno != 0 )
 			{
 				return;
 			}
 			
-			/// Reset fields, focus on count field
-			$("#CardCount").val("");
-			$("#CardName").val("");
-			$("#CardCount").focus();
+			
 		}
 	}
 	//alert(url);
 	xmlhttp.open("GET", url, true);
 	xmlhttp.send();
-	
-	$("#cardSuggestionBox").hide();
-	$("#setSuggestions").html("");
 }
 
 function DisplayCardNameSuggestions()
@@ -262,4 +269,31 @@ function SetNameField(_name)
 	$("#CardName").val(_name);
 	$("#cardSuggestionBox").hide();
 	DisplaySetSuggestions();
+}
+
+function multipleCardSubmit()
+{
+	"use strict";
+	
+	var text = $("#groupCardArea").val();
+	var lines = text.split( "\n" );
+	
+	var setcode = $("#groupSetText").val();
+	
+	$("#MessageBox").html( "" );
+	
+	for ( var i = 0; i < lines.length; ++i )
+	{
+		var line = lines[i];
+		if ( line.length < 3 )
+		{
+			break;
+		}
+		
+		var b = line.indexOf( " " );
+		var count = line.substr( 0, b );
+		var name = line.substr( b+1 );
+		SendCardAJAX( count, name, setcode );
+	}
+	
 }

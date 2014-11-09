@@ -159,6 +159,7 @@ Defines::$SetcodeOrder = array(
 	'V14',
 	'DDN',
 	'KTK',
+	'C14',
 );
 
 Defines::$SetcodeToIndices = array_flip(Defines::$SetcodeOrder);
@@ -297,6 +298,7 @@ Defines::$SetCodeToNameMap = array(
 	'V14' => "From the Vaults: Annihilation",
 	'DDN' => "Duel Decks: Speed vs. Cunning",
 	'KTK' => "Khans of Tarkir",
+	'C14' => "Commander 2014",
 );
 
 Defines::$SetNameToCodeMap = array_flip(Defines::$SetCodeToNameMap);
@@ -329,7 +331,7 @@ Defines::$CardBlocksToSetCodes = array(
 	"From the Vault"			=> array( 'DRB', 'V09', 'V10', 'V11', 'V12', 'V13', ),
 	"Un- Sets"					=> array( 'UGL', 'UNH', ),
 	"Portal / Starter Sets"		=> array( 'POR', 'P02', 'PTK', 'S99', 'S00', ),
-	"Casual Supplements"		=> array( 'VAN', 'HOP', 'ARC', 'CMD', 'PC2', 'C13', 'CNS', ),
+	"Casual Supplements"		=> array( 'VAN', 'HOP', 'ARC', 'CMD', 'PC2', 'C13', 'CNS', 'C14', ),
 	"Premium Decks"				=> array( 'H09', 'PD2', 'PD3', ),
 	"Miscellaneous"				=> array( 'PPR', 'ME3', 'ME2', 'MED', 'CHR', 'BTD', 'BRB', 'MMA', 'VMA',),
 );

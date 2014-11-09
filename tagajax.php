@@ -60,6 +60,17 @@ else if ( $_GET["mode"] == "add" || $_GET["mode"] == "remove" )
 	$TagID = $_GET['tagid'];
 	$CardID = $_GET['cardid'];
 	
+	$TagNameStmt = $DelverDBLink->prepare( "SELECT * FROM tags WHERE uid = ?" );
+	$TagNameStmt->bind_param( "i", $TagID );
+	$TagNameStmt->execute();
+	$TagNameResult = $TagNameStmt->get_result();
+	
+	$TagName = null;
+	if ( $row = $TagNameResult->fetch_assoc() )
+	{
+		$TagName = $row['name'];
+	}
+	
 	$TagCardCheckStmt = $DelverDBLink->prepare( "SELECT * FROM taglinks WHERE tagid = ? AND cardid = ?" ) or die ( $DelverDBLink->error );
 	$TagCardCheckStmt->bind_param( "ii", $TagID, $CardID );
 	$TagCardCheckStmt->execute();
@@ -68,7 +79,7 @@ else if ( $_GET["mode"] == "add" || $_GET["mode"] == "remove" )
 	{
 		if ( $_GET["mode"] == "add" )
 		{
-			ReturnXML( -6, "Card already has that tag" );	
+			ReturnXML( -6, "Card already has that tag", $TagName );	
 		}
 		else
 		{
@@ -76,26 +87,32 @@ else if ( $_GET["mode"] == "add" || $_GET["mode"] == "remove" )
 			$RemoveTagStmt->bind_param( "ii", $TagID, $CardID );
 			$RemoveTagStmt->execute();
 			
-			ReturnXML( 3, "Tag removed" );
+			ReturnXML( 3, "Tag removed", $TagName );
 		}
 	}
-	
-	$TagCardStmt = $DelverDBLink->prepare( "INSERT INTO taglinks (tagid, cardid) VALUES( ?, ? )" ) or die( $DelverDBLink->error() );
-	$TagCardStmt->bind_param( "ii", $TagID, $CardID );
-	$TagCardStmt->execute();
-	
-	ReturnXML( 2, "Tag added" );
+	else 
+	{
+		$TagCardStmt = $DelverDBLink->prepare( "INSERT INTO taglinks (tagid, cardid) VALUES( ?, ? )" ) or die( $DelverDBLink->error() );
+		$TagCardStmt->bind_param( "ii", $TagID, $CardID );
+		$TagCardStmt->execute();
+		
+		ReturnXML( 2, "Tag added", $TagName);
+	}
 }
 else
 {
 	ReturnXML( 0, "Unknown mode" );	
 }
 
-function ReturnXML( $errno, $msg )
+function ReturnXML( $errno, $msg, $tagName = null )
 {
 	$xmlstr = "<response>$msg</response>";
 	$response = new SimpleXMLElement($xmlstr);
-	$response->addAttribute('errno', $errno);
+	$response->addAttribute( 'errno', $errno);
+	if ( $tagName != null )
+	{
+		$response->addAttribute( "tagname", $tagName );
+	}
 	echo $response->asXML();
 	exit;
 }

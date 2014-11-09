@@ -15,12 +15,14 @@ if($DelverDBLink->connect_errno)
 {
 	$DBLog->err("Error connecting to database (".$DelverDBLink->connect_errno.") ".$DelverDBLink->connect_error);
 	ReturnXML(1, "Internal Error");
+	exit;
 }
 
 if(!IsLoggedIn())
 {
 	$UserLog->warning("Attempted access to usercardsajax.php by non-connected user");
 	ReturnXML(2, "Login Required");
+	exit;
 }
 
 $userid = $_SESSION['userid'];
@@ -29,6 +31,7 @@ if(!array_key_exists('count', $_GET))
 {
 	$CardLog->warning("No card count found during card insertion");
 	ReturnXML(3, "Card count not found");
+	exit;
 }
 
 $count = $_GET['count'];
@@ -36,12 +39,14 @@ if(!is_numeric($count) || $count == 0 || $count != floor($count))//!is_int($coun
 {
 	$CardLog->warning("Invalid card count: $count");
 	ReturnXML(4, "Card count is invalid: ".$count);
+	exit;
 }
 
 if(!array_key_exists('cardid', $_GET) && !array_key_exists('cardname', $_GET))
 {
 	$CardLog->warning("Neither card ID or name found");
 	ReturnXML(5, "Card ID or name required.");
+	exit;
 }
 
 $cardid = null;
@@ -339,6 +344,7 @@ function ReturnXML($errno, $msg, $cardid=null, $setcode=null, $newcount=0)
 	$response->addAttribute('setcode', $setcode);
 	$response->addAttribute('newcount', $newcount);
 	echo $response->asXML();
+	//exit;
 }
 
 function AddCardChangeLog( $_userID, $_cardID, $_setcode, $_changeAmount )

@@ -62,13 +62,15 @@
 		<input type="button" value="Create" onclick="javascript:onCreateTag({{ card.id }})" />
 	</span>
 	
-	{% for tag in card.tags %}
-		<span class="tag">{{ tag.name }}
-			<a href="javascript:void()" onclick="javascript:onRemoveTag( {{ card.id }}, {{ tag.id }} )" >
-				<img alt="x" src="images/remove_x.png" />
-			</a>
-		</span>
-	{% endfor %}
+	<span id="tagList_{{ card.id }}">
+		{% for tag in card.tags %}
+			<span class="tag">{{ tag.name }}
+				<a href="javascript:void()" onclick="javascript:onRemoveTag( {{ card.id }}, {{ tag.id }} )" >
+					<img alt="x" src="images/remove_x.png" />
+				</a>
+			</span>
+		{% endfor %}
+	</span>
 </td>
 <td class='StandardSetsColumn'>
 {% if showOwnerships %}

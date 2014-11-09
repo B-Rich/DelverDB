@@ -1,5 +1,6 @@
 <?php
 
+include_once "passwords.php";
 include_once "users.php";
 
 global $IsLoggedIn, $LoginErrorMessage;
@@ -11,6 +12,14 @@ $twig = new Twig_Environment($loader);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// HEADER
+
+$SQLUser = $SQLUsers['oracle_search'];
+$DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "magic_db");
+if ( $DelverDBLink->connect_errno )
+{
+	$DBLog->err( "Connection error (".$DelverDBLink->connect_errno.") ".$DelverDBLink->connect_error );
+	die( "Connection error" );
+}
 
 $template = $twig->loadTemplate('header.twig');
 $args = array();
@@ -121,16 +130,8 @@ foreach(Defines::$ColourNamesToSymbols as $name => $symbol)
 }
 $args['parametertypes'][] = $colours;
 
-/// COLOUR IDENTITY
-
+/// COLOURS
 $args['colours'] = array( 'w', 'u', 'b', 'r', 'g' );
-
-/*$colourIdentity = new ParameterType('colourid', 'Colour Identity', true, 'and', 'select');
-foreach ( Defines::$ColourNamesToSymbols as $name => $symbol )
-{
-	$colourIdentity->options[] = new Option($symbol, $name);
-}
-$args['parametertypes'][] = $colourIdentity;*/
 
 /// NUMCOLOURS
 $args['parametertypes'][] = new ParameterType("numcolours", "Colour Count", true, 'or', 'numeric');
@@ -167,7 +168,7 @@ $args['parametertypes'][] = new ParameterType("toughness", "Toughness", true, 'o
 $rarities = new ParameterType('rarity', 'Rarity', true, 'and', 'select');
 foreach(Defines::$RarityNameToSymbol as $name => $symbol)
 {
-	$rarities->options[] = new Option($symbol, $name);
+	$rarities->options[] = new Option( $symbol, $name );
 }
 $args['parametertypes'][] = $rarities;
 
@@ -179,6 +180,17 @@ if ( $IsLoggedIn == true )
 {
 	$args['parametertypes'][] = new ParameterType( 'count', 'Count', true, 'and', 'numeric' );
 }
+
+/// TAGS
+$TagStmt = $DelverDBLink->prepare( "SELECT * FROM tags" );
+$TagStmt->execute();
+$TagResults = $TagStmt->get_result();
+$tags = new ParameterType( 'tag', 'Tag', false, null, 'select' );
+while ( $row = $TagResults->fetch_assoc() )
+{
+	$tags->options[] = new Option( $row['name'], $row['name'] );	
+}
+$args['parametertypes'][] = $tags;
 
 /// SORT
 

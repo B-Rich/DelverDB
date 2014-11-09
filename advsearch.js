@@ -1,5 +1,5 @@
-var ParameterTypes = ['name', 'rules', 'expansion', 'format', 'colour', 'colourid', 'numcolours', 'type', 'subtype', 'cost', 'cmc', 'power', 'toughness', 'rarity', 'artist', 'count', 'order'];
-var DisplayParamTypes = ['Name', 'Rules Text', 'Expansion', 'Format', 'Colour', 'Colour Identity', 'Colour Count', 'Type', 'Subtype', 'Mana Cost', 'Converted Mana Cost', 'Power', 'Toughness', 'Rarity', 'Artist', 'Count', 'Sort Order'];
+var ParameterTypes = ['name', 'rules', 'expansion', 'format', 'colour', 'colourid', 'numcolours', 'type', 'subtype', 'cost', 'cmc', 'power', 'toughness', 'rarity', 'artist', 'count', 'tag', 'order'];
+var DisplayParamTypes = ['Name', 'Rules Text', 'Expansion', 'Format', 'Colour', 'Colour Identity', 'Colour Count', 'Type', 'Subtype', 'Mana Cost', 'Converted Mana Cost', 'Power', 'Toughness', 'Rarity', 'Artist', 'Count', 'Tag', 'Sort Order'];
 
 function Parameter()
 {
@@ -55,7 +55,7 @@ function AddParam( _paramType )
 	$('#'+_paramType+'field').val("");
 	
 	var pieces;
-	if ( _paramType != "format" )
+	if ( _paramType != "format" && _paramType != "tag" )
 	{
 		pieces = splitstring(paramValue);
 	}

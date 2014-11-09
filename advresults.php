@@ -117,7 +117,6 @@ if ( count($QueryStack) > 0 )
 }
 $SearchStmt->execute();
 $SearchResults = $SearchStmt->get_result();
-
 if ( $SearchResults == null )
 {
 	$SearchLog->log("Invalid query \"$QueryString\": " . $DelverDBLink->error);
@@ -125,7 +124,6 @@ if ( $SearchResults == null )
 }
 
 $CardIDArray = array();
-
 while ( $row = $SearchResults->fetch_assoc() )
 {
 	array_push( $CardIDArray, $row['cardid'] );
@@ -134,39 +132,31 @@ while ( $row = $SearchResults->fetch_assoc() )
 $CardCountStmt = null;
 $IsCardCountSearch = $IsLoggedIn && ( array_key_exists( 'count', $_GET )
 	 || ( array_key_exists( 'mycards', $_GET ) && $_GET['mycards'] == 1 ) );
-$UserCardCountArray = array();
+//$UserCardCountArray = array();
 
-if ( $IsCardCountSearch )
+$UserCardArray = null;
+if ( $IsLoggedIn )
 {
+	$UserCardArray = array();
 	// Use the old query to find how many of each card ID teh user owns
-	$query = "SELECT cardid, count FROM usercards
-			WHERE ownerid = 1 AND cardid
-			IN ( SELECT DISTINCT oracle.cardid $QueryString ) ORDER BY cardid";
-	$SearchLog->log( "Searching " . $query );
-	$newOwnershipStmt = $DelverDBLink->prepare( $query );
-	if ( $newOwnershipStmt == null )
-	{
-		$DBLog->err( "Error preparing CardOwnershipStmt " . $DelverDBLink->error );
-		die(  "Internal error" );
-	}
+	$query = "SELECT cardid, count, setcode FROM usercards
+	WHERE ownerid = 1";
+	$userCardStmt = $DelverDBLink->prepare( $query );
+	$userCardStmt->execute();
+	$userCardResults = $userCardStmt->get_result();
 	
-	if ( count( $QueryStack ) > 0 )
+	while ( $row = $userCardResults->fetch_row() )
 	{
-		call_user_func_array( array( $newOwnershipStmt, 'bind_param' ), $StackCopy );
-	}
-	$newOwnershipStmt->execute();
-	$newOwnershipResults = $newOwnershipStmt->get_result();
-	
-	while ( $row = $newOwnershipResults->fetch_row() )
-	{
-		if ( array_key_exists( $row[0], $UserCardCountArray ) == false )
+		$cardID = $row[0];
+		$count = $row[1];
+		$setcode = $row[2];
+		
+		if ( !array_key_exists( $cardID, $UserCardArray) )
 		{
-			$UserCardCountArray[$row[0]] = $row[1];
+			$UserCardArray[$cardID] = array();	
 		}
-		else
-		{
-			$UserCardCountArray[$row[0]] += $row[1];
-		}
+		
+		$UserCardArray[$cardID][$setcode] = $count;
 	}
 }
 
@@ -181,19 +171,23 @@ if ( array_key_exists( 'count', $_GET ) && $IsLoggedIn )
 	RemoveUserCountMatches();
 }
 
-// Does USERID own CARDID
-$OwnershipStmt = null;
-if ( $IsLoggedIn == true )
+$TagIDList = null;
+$IsTagSearch = array_key_exists( 'tag', $_GET );
+if ( $IsTagSearch )
 {
-	$OwnershipStmt = $DelverDBLink->prepare( "SELECT setcode, count FROM usercards WHERE ownerid = $UserID AND cardid = ?" );
-	if ( $OwnershipStmt == null )
+	$TagIDList = FindTagIDs();
+	
+	$newArray = array();
+	foreach ( $CardIDArray as $index => $cardID )
 	{
-		$DBLog->err( "Error preparing statement: ".$DelverDBLink->error );
-		die(  "Internal error" );
+		if ( DoesCardMatchTagParameters( $cardID ) )
+		{
+			$newArray[] = $cardID;
+		}	
 	}
+	
+	$CardIDArray = $newArray;
 }
-$OwnershipResults = null;
-
 
 $CardCount = count( $CardIDArray );
 
@@ -233,13 +227,11 @@ $CardIndex = 0;
 $NumberOfCardsDisplayed = 0;
 $NumberOfCardsIgnored = 0;
 
-
 $TemplateArgs['showOwnerships'] = $IsLoggedIn;
 
 for ( $CardIndex = 0; $CardIndex < $CardCount; ++$CardIndex )
 {
 	$cardID = $CardIDArray[$CardIndex];
-	$OwnershipResults = null;
 	
 	if ( $NumberOfCardsIgnored < $CurrentPage * $ResultsPerPage)
 	{
@@ -247,44 +239,18 @@ for ( $CardIndex = 0; $CardIndex < $CardCount; ++$CardIndex )
 		continue;
 	}
 	
-	if ( $MyCardsOnly == true )
-	{
-		$OwnershipStmt->bind_param( "i", $cardID );
-		$OwnershipStmt->execute();
-		$OwnershipResults = $OwnershipStmt->get_result();
-	}
-	
-	
 	$OracleDataStmt->bind_param( 'i', $cardID );
 	$OracleDataStmt->execute();
 	$oracleResult = $OracleDataStmt->get_result();
 	$oracleRow = $oracleResult->fetch_assoc();
 	
-	$ownershipArray = null;
 	if ( $IsLoggedIn == true )
 	{
-		// If we haven't already checked to see if I own that card, then do it here
-		$ownershipArray = array();
-		if ( $OwnershipResults == null )
-		{
-			$OwnershipStmt->bind_param( "i", $cardID );
-			$OwnershipStmt->execute();
-			$OwnershipResults = $OwnershipStmt->get_result();
-		}
-		
-		while ( $ownRow = $OwnershipResults->fetcH_assoc() )
-		{
-			$setcode = $ownRow['setcode'];
-			$count = $ownRow['count'];
-			$ownershipArray[$setcode] = $count;
-		}
-		
-		if ( $MyCardsOnly == true && count( $ownershipArray ) == 0 )
+		if ( $MyCardsOnly && !array_key_exists( $cardID, $UserCardArray ) )
 		{
 			// Ignore this card, and move on
 			continue;
 		}
-		
 	}
 	
 	$completeCard = new Card();
@@ -306,10 +272,11 @@ for ( $CardIndex = 0; $CardIndex < $CardCount; ++$CardIndex )
 		
 		$count = 0;
 		/// Use the count if the user is logged in, and owns the card
-		if ( $ownershipArray != null
-		  && array_key_exists( $setcode, $ownershipArray ) )
+		if ( $UserCardArray != null
+		   && array_key_exists( $cardID, $UserCardArray )
+	       && array_key_exists( $setcode, $UserCardArray[$cardID] ) )
 		{
-			$count = $ownershipArray[$setcode];
+			$count = $UserCardArray[$cardID][$setcode];
 		}
 		$completeCard->AddSet( $setcode, $rarity, $cnum, $artist, $count );
 	}
@@ -322,7 +289,6 @@ for ( $CardIndex = 0; $CardIndex < $CardCount; ++$CardIndex )
 	$cardTagResults = $CardTagStmt->get_result();
 	while ( $tagRow = $cardTagResults->fetch_assoc() )
 	{
-		print ( "Tag name " + $tagRow['name'] );
 		$completeCard->tags[] = array( "id" => $tagRow['tagid'], "name" => $tagRow['name'] );
 	}
 	
@@ -409,7 +375,6 @@ function BooleanSymbolToSQL( $_symbol )
 function nameCardMatch($name, $comp)
 {
 	global  $QueryStack, $QueryFormat, $ParamsDisplay;
-	//$name = '%'.$name.'%';
 	array_push($QueryStack, $name);
 	array_push($QueryFormat, "s");
 	return "(oracle.name REGEXP ? )";
@@ -418,7 +383,6 @@ function nameCardMatch($name, $comp)
 function rulesCardMatch($rules, $comp)
 {
 	global $QueryStack, $QueryFormat, $ParamsDisplay;
-	//$rules = '%'.$rules.'%';
 	array_push($QueryStack, $rules);
 	array_push($QueryFormat, "s");
 	return "(oracle.rules IS NOT NULL AND oracle.rules REGEXP ? )";
@@ -510,7 +474,6 @@ function numcoloursCardMatch( $numcolours, $comp )
 function typeCardMatch($type, $comp)
 {
 	global $QueryStack, $QueryFormat, $ParamsDisplay;
-	//$type = '%'.$type.'%';
 	array_push($QueryStack, $type);
 	array_push($QueryFormat, "s");
 	return " ( oracle.type IS NOT NULL AND oracle.type REGEXP ?) ";
@@ -518,7 +481,6 @@ function typeCardMatch($type, $comp)
 function subtypeCardMatch($subtype, $comp)
 {
 	global $QueryStack, $QueryFormat, $ParamsDisplay;
-	//$subtype = '%'.$subtype.'%';
 	array_push($QueryStack, $subtype);
 	array_push($QueryFormat, "s");
 	return " ( oracle.subtype IS NOT NULL AND oracle.subtype REGEXP ? ) ";
@@ -527,7 +489,6 @@ function subtypeCardMatch($subtype, $comp)
 function costCardMatch($cost, $comp)
 {
 	global $QueryStack, $QueryFormat, $ParamsDisplay;
-	//$cost = '%'.$cost.'%';
 	array_push($QueryStack, $cost);
 	array_push($QueryFormat, "s");
 	return "(oracle.cost IS NOT NULL AND oracle.cost REGEXP ? )";
@@ -612,7 +573,6 @@ function rarityCardMatch($rarity, $comp)
 function artistCardMatch( $artist, $comp )
 {
 	global $QueryStack, $QueryFormat, $ParamsDisplay;
-	//$artist = '%'.$artist.'%';
 	array_push( $QueryStack, $artist );
 	array_push( $QueryFormat, "s" );
 	return " (cardsets.artist REGEXP ?) ";
@@ -644,14 +604,16 @@ function CreateQuery( $_allParams )
 		$paramCount += count($list);
 	}
 	
-	if ( $paramCount == 0 )//&& !array_key_exists( 'count', $_GET ) )
+	$AndBufferNeeded = false;
+	$HashQueryChanged = false;
+	$query .= " WHERE ";
+	
+	if ( $paramCount == 0 )
 	{
 		$WarningMessages[] = "No valid parameters found.";
 	}
 	else 
 	{
-		$query .= " WHERE ";
-		
 		$typeIndex = 0;
 		$selectedColours = array();
 		foreach ( $_allParams->parameterArray as $type => $parameters )
@@ -662,9 +624,10 @@ function CreateQuery( $_allParams )
 				continue;
 			}
 			
-			if ( $typeIndex != 0 )
+			if ( $AndBufferNeeded )
 			{
 				$query .= " AND ";
+				$AndBufferNeeded = false;
 			}
 			
 			$query .= "(";	
@@ -705,13 +668,11 @@ function CreateQuery( $_allParams )
 					continue;
 				}
 				$query .= $str;
+				$AndBufferNeeded = true;
+				$HashQueryChanged = true;
 			}
 			
 			$query .= ")";
-			/*if ( array_key_exists( $type, $requiredFields ) == true )
-			{
-				$query .= " AND $type IS NOT NULL ";
-			}*/
 			
 			++$typeIndex;
 		}
@@ -719,7 +680,12 @@ function CreateQuery( $_allParams )
 	
 	if ( $_allParams->multicolouredOnly == true )
 	{
-		$query .= " AND (BIT_COUNT(oracle.colour) > 1) ";
+		if ( $AndBufferNeeded )
+		{
+			$query .= " AND ";
+		}
+		$query .= " (BIT_COUNT(oracle.colour) > 1) ";
+		$HashQueryChanged = true;
 	}
 
 	if ( $_allParams->excludeUnselectedColours == true )
@@ -739,7 +705,14 @@ function CreateQuery( $_allParams )
 					$colourFlags |= $flag;
 				}
 			}
-			$query .= " AND ( (oracle.colour & $colourFlags) = 0 ) ";
+			
+			if ( $AndBufferNeeded )
+			{
+				$query .= " AND ";
+			}
+			
+			$query .= " ( (oracle.colour & $colourFlags) = 0 ) ";
+			$HashQueryChanged = true;
 		}
 
 	}
@@ -747,11 +720,22 @@ function CreateQuery( $_allParams )
 	if ( is_numeric( $_allParams->colourIdentity )
 	  && $_allParams->colourIdentity != 31 )
 	{
+		if ( $AndBufferNeeded )
+		{
+			$query .= " AND ";
+		}
+		
 		$otherColours = ~($_allParams->colourIdentity + 0);
-		$query .= " AND ( oracle.colouridentity & $otherColours = 0 ) ";
+		$query .= " ( oracle.colouridentity & $otherColours = 0 ) ";
+		$HashQueryChanged = true;
 	}
 
-	$query.= CreateSQLOrderString( $_allParams );
+	if ( !$HashQueryChanged )
+	{
+		$query .= " TRUE ";	
+	}
+	
+	$query .= CreateSQLOrderString( $_allParams );
 
 	return $query;
 }
@@ -879,7 +863,7 @@ function ParseParameters()
 			}
 			SplitParameterArray( $allParams, $parameterValue, $parameterType );
 		}
-		else if ( $parameterType != 'count' )
+		else if ( $parameterType != 'count' && $parameterType != 'tag' )
 		{
 			$WarningMessages[] = "Uncaught parameter type $parameterType.";
 		}
@@ -953,7 +937,7 @@ function SplitParameter( $_param ) // Returns SearchParameter
 
 function RemoveCardIDsFromUserData()
 {
-	global $IsLoggedIn, $CardIDArray, $UserCardCountArray;
+	global $IsLoggedIn, $CardIDArray, $UserCardArray;
 
 	$newArray = array();
 	
@@ -961,9 +945,8 @@ function RemoveCardIDsFromUserData()
 
 	foreach ( $CardIDArray as $cardID )
 	{
-		if ( array_key_exists( $cardID, $UserCardCountArray ) )
+		if ( array_key_exists( $cardID, $UserCardArray ) )
 		{
-			//unset( $CardIDArray[ $cardID ] );
 			$newArray[] = $cardID;
 		}
 	}
@@ -972,7 +955,7 @@ function RemoveCardIDsFromUserData()
 
 function RemoveUserCountMatches()
 {
-	global $IsLoggedIn, $CardCountStmt, $UserCardCountArray, $CardIDArray;
+	global $IsLoggedIn, $CardCountStmt, $UserCardArray, $CardIDArray;
 	
 	$cardCountArgs = $_GET['count'];
 	if ( is_array( $cardCountArgs ) == false )
@@ -997,7 +980,7 @@ function RemoveUserCountMatches()
 	foreach ( $CardIDArray as $id )
 	{
 		// No data means the user must own zero of the card
-		$count = array_key_exists( $id, $UserCardCountArray ) ? $UserCardCountArray[$id] : 0;
+		$count = array_key_exists( $id, $UserCardArray ) ? array_sum( $UserCardArray[$id] ) : 0;
 		
 		$goodID = true;
 		foreach ( $paramArray as $param )
@@ -1057,6 +1040,47 @@ function RemoveUserCountMatches()
 		}
 	}
 	$CardIDArray = $newArray;
+}
+
+function FindTagIDs()
+{
+	global $DelverDBLink;
+	$TagNameStmt = $DelverDBLink->prepare( "SELECT uid FROM tags WHERE name = ?" );
+	
+	$TagIDList = array();
+	
+	foreach ( $_GET['tag'] as $index => $tagName )
+	{
+		$TagNameStmt->bind_param( "s", $tagName );
+		$TagNameStmt->execute();
+		$TagNameResults = $TagNameStmt->get_result();
+		$row = $TagNameResults->fetch_assoc();
+		if ( $row == null )
+		{
+			continue;
+		}
+		$tagID = $row['uid'];
+		$TagIDList[] = $tagID;
+	}
+	return $TagIDList;
+}
+
+function DoesCardMatchTagParameters( $_cardID )
+{
+	global $CardIDArray, $DelverDBLink, $TagIDList;
+
+	$TagLinKStmt = $DelverDBLink->prepare( "SELECT * FROM taglinks WHERE cardid = ? AND tagid = ?" );
+	
+	foreach ( $TagIDList as $index => $tagID )
+	{
+		$TagLinKStmt->bind_param( "ii", $_cardID, $tagID );
+		$TagLinKStmt->execute();
+		if ( $TagLinKStmt->get_result()->fetch_assoc() != null )
+		{
+			return true;	
+		}
+	}
+	return false;
 }
 
 class AllParameters
