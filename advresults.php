@@ -126,18 +126,19 @@ if ( $SearchResults == null )
 $CardIDArray = array();
 while ( $row = $SearchResults->fetch_assoc() )
 {
-	array_push( $CardIDArray, $row['cardid'] );
+	$CardIDArray[] = $row['cardid'];
 }
 
 $CardCountStmt = null;
 $IsCardCountSearch = $IsLoggedIn && ( array_key_exists( 'count', $_GET )
 	 || ( array_key_exists( 'mycards', $_GET ) && $_GET['mycards'] == 1 ) );
-//$UserCardCountArray = array();
 
 $UserCardArray = null;
+$UserOwnedCards = null;
 if ( $IsLoggedIn )
 {
 	$UserCardArray = array();
+	$UserOwnedCards = array();
 	// Use the old query to find how many of each card ID teh user owns
 	$query = "SELECT cardid, count, setcode FROM usercards
 	WHERE ownerid = 1";
@@ -154,6 +155,7 @@ if ( $IsLoggedIn )
 		if ( !array_key_exists( $cardID, $UserCardArray) )
 		{
 			$UserCardArray[$cardID] = array();	
+			$UserOwnedCards[] = $cardID;
 		}
 		
 		$UserCardArray[$cardID][$setcode] = $count;
@@ -173,9 +175,12 @@ if ( array_key_exists( 'count', $_GET ) && $IsLoggedIn )
 
 $TagIDList = null;
 $IsTagSearch = array_key_exists( 'tag', $_GET );
+$TagLinkStmt = $DelverDBLink->prepare( "SELECT * FROM taglinks WHERE cardid = ? AND tagid = ?" );
+
 if ( $IsTagSearch )
 {
 	$TagIDList = FindTagIDs();
+	
 	
 	$newArray = array();
 	foreach ( $CardIDArray as $index => $cardID )
@@ -186,7 +191,7 @@ if ( $IsTagSearch )
 		}	
 	}
 	
-	$CardIDArray = $newArray;
+	$CardIDArray = array_values( $newArray );
 }
 
 $CardCount = count( $CardIDArray );
@@ -752,6 +757,7 @@ function CreateSQLOrderString( $_allParams )
 		'power' => 'oracle.numpower',
 		'toughness' => 'oracle.numtoughness',
 		'rating' => 'oracle.rating',
+		'type' => 'oracle.type',
 	);
 	
 	foreach ( $_allParams->sortParameters as $str )
@@ -937,20 +943,19 @@ function SplitParameter( $_param ) // Returns SearchParameter
 
 function RemoveCardIDsFromUserData()
 {
-	global $IsLoggedIn, $CardIDArray, $UserCardArray;
+	global $IsLoggedIn, $CardIDArray, $UserCardArray, $UserOwnedCards;
 
 	$newArray = array();
 	
 	$myCardsOnly = ( $IsLoggedIn && array_key_exists('mycards', $_GET) && $_GET['mycards'] != '0' );
 
-	foreach ( $CardIDArray as $cardID )
+	if ( !$myCardsOnly )
 	{
-		if ( array_key_exists( $cardID, $UserCardArray ) )
-		{
-			$newArray[] = $cardID;
-		}
+		return;	
 	}
-	$CardIDArray = $newArray;
+	
+	$temp = array_intersect( $CardIDArray, $UserOwnedCards );
+	$CardIDArray = array_values( $temp );
 }
 
 function RemoveUserCountMatches()
@@ -1067,15 +1072,13 @@ function FindTagIDs()
 
 function DoesCardMatchTagParameters( $_cardID )
 {
-	global $CardIDArray, $DelverDBLink, $TagIDList;
-
-	$TagLinKStmt = $DelverDBLink->prepare( "SELECT * FROM taglinks WHERE cardid = ? AND tagid = ?" );
+	global $CardIDArray, $DelverDBLink, $TagIDList, $TagLinkStmt;
 	
 	foreach ( $TagIDList as $index => $tagID )
 	{
-		$TagLinKStmt->bind_param( "ii", $_cardID, $tagID );
-		$TagLinKStmt->execute();
-		if ( $TagLinKStmt->get_result()->fetch_assoc() != null )
+		$TagLinkStmt->bind_param( "ii", $_cardID, $tagID );
+		$TagLinkStmt->execute();
+		if ( $TagLinkStmt->get_result()->fetch_assoc() != null )
 		{
 			return true;	
 		}

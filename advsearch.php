@@ -201,6 +201,7 @@ $SortLabelToValue = array(
 	'Power' =>'power',
 	'Toughess' =>'toughness',
 	'Community Rating' => 'rating',
+	'Type' => 'type',
 );
 
 $sort = new ParameterType('order', 'Sort', false, null, 'select');

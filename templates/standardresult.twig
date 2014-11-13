@@ -64,7 +64,7 @@
 	
 	<span id="tagList_{{ card.id }}">
 		{% for tag in card.tags %}
-			<span class="tag">{{ tag.name }}
+			<span class="tag" id="tag_{{ card.id }}_{{ tag.id }}" >{{ tag.name }}
 				<a href="javascript:void()" onclick="javascript:onRemoveTag( {{ card.id }}, {{ tag.id }} )" >
 					<img alt="x" src="images/remove_x.png" />
 				</a>

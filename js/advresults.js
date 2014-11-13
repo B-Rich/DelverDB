@@ -32,7 +32,7 @@ function onAddTag( _cardID )
 				//TODO: FOOBAR
 				//window.location.reload();
 				$("#tagList_" + _cardID ).append( 
-				"<span class='tag'>" + tagname +
+				"<span class='tag' id='tag_" + _cardID + "_" + tagID + "' >" + tagname +
 				"<a href='javascript:void()'" +
 				" onclick='javascript:onRemoveTag( " + _cardID + ", " + tagID +" )' >" +
 				"<img alt='x' src='images/remove_x.png' />" +
@@ -101,11 +101,11 @@ function onRemoveTag( _cardID, _tagID )
 			
 			if ( errno > 0 )
 			{
-				window.location.reload();
+				var elementID = "#tag_" + _cardID + "_" + _tagID;
+				$( elementID ).remove();
 			}
 		}
 	}
-	
 	xmlhttp.open( "GET", url, true );
 	xmlhttp.send();
 }
