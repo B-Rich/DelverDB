@@ -168,26 +168,6 @@ if ( $IsLoggedIn && $OwnershipArray != null )
 		
 		$CardChanges[ $setcode ]->changes[] = $change;
 	}
-	
-	
-	/*foreach ( $CardObj->sets as $key => $set )
-	//foreach ( $CardChanges as $setcode => $setChange )
-	{
-		$total = 0;
-		print "<pre>" . print_r( $CardChanges, true ) . "</pre>";
-		$setChange = $CardChanges[$set->code];
-		
-		foreach ( $setChange->changes as $key => $change )
-		{
-			$total += $change->difference;
-		}
-		
-		$actual = $set->count;
-		if ( $total != $actual )
-		{
-			print( "Started with $actual not $total in {$set->code}</br>");	
-		}
-	}*/
 }
 
 class SetChange
@@ -236,7 +216,6 @@ $template = $twig->loadTemplate( 'carddetails.twig' );
 	
 $args['showownerships'] = $IsLoggedIn;
 $args['card'] = $CardObj;
-$args['rating_stars'] = round( $CardObj->rating * 2.0 ) / 2;
 $args['setindex'] = $SelectedSetIndex;
 $args['rarity'] = $CardObj->sets[$SelectedSetIndex]->rarity;
 $args['raritystring'] = $RarityString;

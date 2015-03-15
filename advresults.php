@@ -286,9 +286,7 @@ for ( $CardIndex = 0; $CardIndex < $CardCount; ++$CardIndex )
 		$completeCard->AddSet( $setcode, $rarity, $cnum, $artist, $count );
 	}
 	$completeCard->imageurl = $completeCard->GetFirstImageURL();
-	
-	$completeCard->ratingStars = round( $completeCard->rating * 2.0 ) / 2;
-	
+
 	$CardTagStmt->bind_param( "i", $cardID );
 	$CardTagStmt->execute();
 	$cardTagResults = $CardTagStmt->get_result();
@@ -756,7 +754,6 @@ function CreateSQLOrderString( $_allParams )
 		'cmc' => 'oracle.cmc',
 		'power' => 'oracle.numpower',
 		'toughness' => 'oracle.numtoughness',
-		'rating' => 'oracle.rating',
 		'type' => 'oracle.type',
 	);
 	

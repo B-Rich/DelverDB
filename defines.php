@@ -253,7 +253,7 @@ Defines::$SetCodeToNameMap = array(
 	'WWK' => "Worldwake",
 	'DDE' => "Duel Decks: Phyrexia vs. the Coalition",
 	'ROE' => "Rise of the Eldrazi",
-	'DPD' => "Duel of the Planeswalkers Decks",
+	'DPA' => "Duel of the Planeswalkers Decks",
 	'ARC' => "Archenemy",
 	'M11' => "Magic 2011",
 	'V10' => "From the Vault: Relics",
@@ -301,6 +301,7 @@ Defines::$SetCodeToNameMap = array(
 	'KTK' => "Khans of Tarkir",
 	'C14' => "Commander 2014",
 	'FRF' => "Fate Reforged",
+	'DDO' => "Duel Decks: Elspeth vs. Kiora",
 );
 
 Defines::$SetNameToCodeMap = array_flip(Defines::$SetCodeToNameMap);
@@ -329,7 +330,7 @@ Defines::$CardBlocksToSetCodes = array(
 	"Ice Age Block"				=> array( 'ICE', 'ALL', 'CSP', ),
 	"Early Expansions"			=> array( 'ARN', 'ATQ', 'LEG', 'DRK', 'FEM', ),
 	"Core Sets"					=> array( 'LEA', 'LEB', '2ED', '3ED', '4ED', '5ED', '6ED', '7ED', '8ED', '9ED', '10E', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15', ),
-	"Duel Decks"				=> array( 'EVG', 'DD2', 'DDC', 'DDD', 'DDE', 'DDF', 'DDG', 'DDH', 'DDI', 'DDJ', 'DDK', 'DDL', 'DDM', 'DDN', ),
+	"Duel Decks"				=> array( 'EVG', 'DD2', 'DDC', 'DDD', 'DDE', 'DDF', 'DDG', 'DDH', 'DDI', 'DDJ', 'DDK', 'DDL', 'DDM', 'DDN', 'DDO', ),
 	"From the Vault"			=> array( 'DRB', 'V09', 'V10', 'V11', 'V12', 'V13', ),
 	"Un- Sets"					=> array( 'UGL', 'UNH', ),
 	"Portal / Starter Sets"		=> array( 'POR', 'P02', 'PTK', 'S99', 'S00', ),

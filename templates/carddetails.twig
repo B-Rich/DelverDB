@@ -61,8 +61,6 @@
 						{{ card.power }}/{{ card.toughness }} 
 					{% elseif card.loyalty is not null %}
 						{{ card.loyalty }}
-					{% elseif card.handmod and card.lifemod %}
-						{{ card.handmod }}/{{ card.lifemod }}
 					{% endif %}
 					</td>
 				</tr>
@@ -115,19 +113,7 @@
   		</td>
   	<tr>
     	<td></td>
-   		<td>
-   		Rating:
-   		{% for i in 0..4 %}
-		 	{% if rating_stars >= i + 1 %}
-				<img src="images/icons/star_full_32.png" class='TextManaSymbol'/>
-			{% elseif (rating_stars - i) >=  0.5 %}
-				<img src="images/icons/star_half_32.png" class='TextManaSymbol'/>
-			{% else %}
-				<img src="images/icons/star_empty_32.png" class='TextManaSymbol'/>
-			{% endif %}
-		{% endfor %}
-		({{ card.rating }} / 5)
-    	</td>
+   		<td></td>
   	</tr>
   	<tr>
   		<td colspan="2">

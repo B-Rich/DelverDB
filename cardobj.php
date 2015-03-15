@@ -14,12 +14,7 @@ class Card
 	public $numtoughness;
 	public $cmc;
 	public $loyalty;
-	public $handmod;
-	public $lifemod;
 	public $rules;
-
-	public $rating;
-	public $ratingStars;
 
 	public $imageurl;
 	public $total;
@@ -41,8 +36,6 @@ class Card
 		$this->power = $cardRow['power'];
 		$this->toughness = $cardRow['toughness'];
 
-		$this->handmod = $cardRow['handmod'];
-		$this->lifemod = $cardRow['lifemod'];
 		$this->loyalty = $cardRow['loyalty'];
 
 		$this->numpower = $cardRow['numpower'];
@@ -54,8 +47,6 @@ class Card
 		$this->rules = str_replace( '(', '<i>(', $this->rules );
 		$this->rules = str_replace( ')', ')</i>', $this->rules );
 		$this->rules = MTGSymbolReplace($this->rules);
-
-		$this->rating = round( $cardRow['rating'], 2 );
 	}
 
 	public function GetlatestSet()

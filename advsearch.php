@@ -200,7 +200,6 @@ $SortLabelToValue = array(
 	'CMC' =>'cmc',
 	'Power' =>'power',
 	'Toughess' =>'toughness',
-	'Community Rating' => 'rating',
 	'Type' => 'type',
 );
 
