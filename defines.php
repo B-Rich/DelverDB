@@ -161,6 +161,8 @@ Defines::$SetcodeOrder = array(
 	'KTK',
 	'C14',
 	'FRF',
+	'DDO',
+	'DTK',
 );
 
 Defines::$SetcodeToIndices = array_flip(Defines::$SetcodeOrder);
@@ -302,12 +304,13 @@ Defines::$SetCodeToNameMap = array(
 	'C14' => "Commander 2014",
 	'FRF' => "Fate Reforged",
 	'DDO' => "Duel Decks: Elspeth vs. Kiora",
+	'DTK' => "Dragons of Tarkir",
 );
 
 Defines::$SetNameToCodeMap = array_flip(Defines::$SetCodeToNameMap);
 
 Defines::$CardBlocksToSetCodes = array(
-	"Khans Block"				=> array( 'KTK', 'FRF', ),
+	"Khans Block"				=> array( 'KTK', 'FRF', 'DTK', ),
 	"Theros Block"				=> array( 'THS', 'BNG', 'JOU', ),
 	"Return to Ravnica Block"	=> array( 'RTR', 'GTC', 'DGM', ),
 	"Innistrad Block"			=> array( 'ISD', 'DKA', 'AVR', ),
@@ -341,9 +344,9 @@ Defines::$CardBlocksToSetCodes = array(
 
 
 Defines::$CardFormats = array(
-	"Standard"					=> array( 'THS', 'BNG', 'JOU', 'M15', 'KTK', 'FRF', ),
-	"Extended"					=> array("SOM", "MBS", "NPH", "M12", "ISD", "DKA", "AVR", "M13", "RTR", "GTC", 'DGM', 'M14', 'THS', 'BNG', 'JOU', 'M15', 'KTK', 'FRF', ),
-	"Modern"					=> array("8ED", "MRD", "DST", "5DN", "CHK", "BOK", "SOK", "9ED", "RAV", "GPT", "DIS", "CSP", "TSP", "TSB", "PLC", "FUT", "10E", "LRW", "MOR", "SHM", "EVE", "ALA", "CON", "ARB", "M10", "ZEN", "WWK", "ROE", "M11", "SOM", "MBS", "NPH", "M12", "ISD", "DKA", "AVR", "M13", "RTR", "GTC", 'DGM', 'M14', 'THS', 'BNG', 'JOU', 'M15', 'KTK', 'FRF', ),
+	"Standard"					=> array( 'THS', 'BNG', 'JOU', 'M15', 'KTK', 'FRF', 'DTK', ),
+	"Extended"					=> array("SOM", "MBS", "NPH", "M12", "ISD", "DKA", "AVR", "M13", "RTR", "GTC", 'DGM', 'M14', 'THS', 'BNG', 'JOU', 'M15', 'KTK', 'FRF', 'DTK', ),
+	"Modern"					=> array("8ED", "MRD", "DST", "5DN", "CHK", "BOK", "SOK", "9ED", "RAV", "GPT", "DIS", "CSP", "TSP", "TSB", "PLC", "FUT", "10E", "LRW", "MOR", "SHM", "EVE", "ALA", "CON", "ARB", "M10", "ZEN", "WWK", "ROE", "M11", "SOM", "MBS", "NPH", "M12", "ISD", "DKA", "AVR", "M13", "RTR", "GTC", 'DGM', 'M14', 'THS', 'BNG', 'JOU', 'M15', 'KTK', 'FRF', 'DTK', ),
 	"Core Sets"					=> array('LEA', 'LEB', '2ED', '3ED', '4ED', '5ED', '6ED', '7ED', '8ED', '9ED', '10E', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15', ),
 	"Ice Age Block"				=> array("ICE", "ALL", "CSP" ),
 	"Innistrad Block"			=> array("ISD", "DKA", "AVR" ),
