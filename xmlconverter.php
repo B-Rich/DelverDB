@@ -65,7 +65,6 @@ if ( $mode == "oracle" )
 		"colouridentity"=>"ci",
 		"subtype"=>"st",
 		"type"=>"t",
-		"rating"=>"rt",
 		"power"=>"pw",
 		"toughness"=>"tf",
 		"loyalty"=>"ly",
