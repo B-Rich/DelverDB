@@ -11,20 +11,6 @@
 	</a>
 	{% autoescape false %}{{ card.cost}} {% endautoescape %} ({{ card.cmc }}) 
 	
-	{% spaceless %}
-	{% for i in 0..4 %}
-	 	{% if card.ratingStars >= i + 1 %}
-			<img src="images/icons/star_full_32.png" class='TextManaSymbol'/>
-		{% elseif (card.ratingStars - i) >=  0.5 %}
-			<img src="images/icons/star_half_32.png" class='TextManaSymbol'/>
-		{% else %}
-			<img src="images/icons/star_empty_32.png" class='TextManaSymbol'/>
-		{% endif %}
-	{% endfor %}
-	{% endspaceless %}
-	({{ card.rating }})
-	
-	
 	</br>
 	{{ card.type }}
 	{% if card.subtype %}

@@ -115,6 +115,7 @@ Defines::$SetcodeOrder = array(
 	'WWK',
 	'DDE',
 	'ROE',
+	'DPA',
 	'DPD',
 	'ARC',
 	'M11',
@@ -303,7 +304,7 @@ Defines::$SetCodeToNameMap = array(
 	'KTK' => "Khans of Tarkir",
 	'C14' => "Commander 2014",
 	'FRF' => "Fate Reforged",
-	'DDO' => "Duel Decks: Elspeth vs. Kiora",
+	'DDO' => "Duel Decks: Kiora vs. Elspeth",
 	'DTK' => "Dragons of Tarkir",
 );
 

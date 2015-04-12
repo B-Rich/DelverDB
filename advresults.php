@@ -377,18 +377,12 @@ function BooleanSymbolToSQL( $_symbol )
 
 function nameCardMatch($name, $comp)
 {
-	global  $QueryStack, $QueryFormat, $ParamsDisplay;
-	array_push($QueryStack, $name);
-	array_push($QueryFormat, "s");
-	return "(oracle.name REGEXP ? )";
+	return decodeStringMatch( $name, "oracle.name" );
 }
 
-function rulesCardMatch($rules, $comp)
+function rulesCardMatch( $rules, $comp )
 {
-	global $QueryStack, $QueryFormat, $ParamsDisplay;
-	array_push($QueryStack, $rules);
-	array_push($QueryFormat, "s");
-	return "(oracle.rules IS NOT NULL AND oracle.rules REGEXP ? )";
+	return decodeStringMatch( $rules, "oracle.rules" );
 }
 
 function expansionCardMatch($expansion, $comp)
@@ -477,24 +471,24 @@ function numcoloursCardMatch( $numcolours, $comp )
 function typeCardMatch($type, $comp)
 {
 	global $QueryStack, $QueryFormat, $ParamsDisplay;
-	array_push($QueryStack, $type);
-	array_push($QueryFormat, "s");
-	return " ( oracle.type IS NOT NULL AND oracle.type REGEXP ?) ";
+	array_push( $QueryStack, "%$type%" );
+	array_push( $QueryFormat, "s" );
+	return " ( oracle.type IS NOT NULL AND oracle.type LIKE ?) ";
 }
 function subtypeCardMatch($subtype, $comp)
 {
 	global $QueryStack, $QueryFormat, $ParamsDisplay;
-	array_push($QueryStack, $subtype);
+	array_push($QueryStack, "%$subtype%");
 	array_push($QueryFormat, "s");
-	return " ( oracle.subtype IS NOT NULL AND oracle.subtype REGEXP ? ) ";
+	return " ( oracle.subtype IS NOT NULL AND oracle.subtype LIKE ? ) ";
 }
 
 function costCardMatch($cost, $comp)
 {
 	global $QueryStack, $QueryFormat, $ParamsDisplay;
-	array_push($QueryStack, $cost);
-	array_push($QueryFormat, "s");
-	return "(oracle.cost IS NOT NULL AND oracle.cost REGEXP ? )";
+	array_push( $QueryStack, "%$cost%" );
+	array_push( $QueryFormat, "s" );
+	return "(oracle.cost IS NOT NULL AND oracle.cost LIKE ? )";
 }
 
 function cmcCardMatch($cmc, $comp)
@@ -575,10 +569,23 @@ function rarityCardMatch($rarity, $comp)
 
 function artistCardMatch( $artist, $comp )
 {
+	return decodeStringMatch( $artist, "cardsets.artist" );
+}
+
+function decodeStringMatch( $text, $rowdef )
+{
 	global $QueryStack, $QueryFormat, $ParamsDisplay;
-	array_push( $QueryStack, $artist );
-	array_push( $QueryFormat, "s" );
-	return " (cardsets.artist REGEXP ?) ";
+	$matches = array();
+	if ( preg_match( "/m\/(.*)\//", $text, $matches ) )
+	{
+		array_push( $QueryStack, $matches[1] );
+		array_push( $QueryFormat, "s" );
+		return "($rowdef IS NOT NULL AND $rowdef REGEXP ? )";
+	}
+
+	array_push($QueryStack, "%$text%" );
+	array_push($QueryFormat, "s");
+	return " ( $rowdef IS NOT NULL AND $rowdef LIKE ? ) ";
 }
 
 ///

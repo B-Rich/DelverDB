@@ -76,8 +76,7 @@ if ( $mode == "oracle" )
 		"numtoughness"=>"ntf",
 		"watermark"=>"wm",
 		"handmod"=>"hm",
-		"lifemod"=>"lm",
-		"linktype"=>"lt", 
+		"lifemod"=>"lm", 
 		"linkid"=>"lid", );
 	
 	$i = 0;
