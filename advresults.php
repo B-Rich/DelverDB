@@ -139,8 +139,8 @@ if ( $IsLoggedIn )
 {
 	$UserCardArray = array();
 	$UserOwnedCards = array();
-	// Use the old query to find how many of each card ID teh user owns
-	$query = "SELECT cardid, count, setcode FROM usercards
+	// Use the old query to find how many of each card ID the user owns
+	$query = "SELECT DISTINCT cardid, count, setcode FROM usercards
 	WHERE ownerid = 1";
 	$userCardStmt = $DelverDBLink->prepare( $query );
 	$userCardStmt->execute();
@@ -218,7 +218,7 @@ $TemplateArgs['pageOffset'] = 3;
 $TemplateArgs['cardCount'] = $CardCount;
 
 $OracleDataStmt = $DelverDBLink->prepare( "SELECT * FROM oracle WHERE cardid = ?");
-$CardSetStmt = $DelverDBLink->prepare( "SELECT setcode, rarity, cnum, artist FROM cardsets WHERE cardid = ?");
+$CardSetStmt = $DelverDBLink->prepare( "SELECT DISTINCT setcode, rarity, cnum, artist FROM cardsets WHERE cardid = ?");
 $CardTagStmt = $DelverDBLink->prepare( "SELECT tags.name, taglinks.tagid FROM taglinks
 		INNER JOIN tags ON taglinks.tagid = tags.uid 
 		WHERE taglinks.cardid = ?" );
@@ -1109,12 +1109,4 @@ class SearchParameter
 	public $bool;
 	public $argument;
 }
-
-class BasicCard
-{
-	public $id;
-	public $dataIndex;
-	public $sets = array();
-}
-
 ?>

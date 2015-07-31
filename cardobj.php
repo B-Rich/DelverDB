@@ -43,7 +43,7 @@ class Card
 		$this->cmc = $cardRow['cmc'];
 
 		$this->rules = $cardRow['rules'];
-		$this->rules = str_replace('~', '</br>', $this->rules);//);
+		$this->rules = str_replace('~', '</br>', $this->rules);
 		$this->rules = str_replace( '(', '<i>(', $this->rules );
 		$this->rules = str_replace( ')', ')</i>', $this->rules );
 		$this->rules = MTGSymbolReplace($this->rules);
@@ -74,7 +74,7 @@ class Card
 	
 	public function GetFirstImageURL()
 	{
-		$set = $this->GetLatestSet();
+		$set = $this->sets[0];
 		return $this->GetImageURLInSet( $set->code );
 	}
 
@@ -84,9 +84,7 @@ class Card
 		$cardname = str_replace($replacements, "", $this->name);
 
 		$imgurl = "images/cardpic/_".$_setcode."/$cardname.jpg";
-		$imgurl = htmlspecialchars($imgurl, ENT_COMPAT);
 		$imgurl = str_replace(' ', '%20', $imgurl);
-		$imgurl = htmlspecialchars($imgurl, ENT_COMPAT);
 		return $imgurl;
 	}
 

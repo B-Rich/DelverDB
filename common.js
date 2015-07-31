@@ -32,6 +32,5 @@ function GetCardImageFilename( _cardname, _setcode )
 	"use strict";
 	_cardname = encodeURI( _cardname );
 	var str = "images/cardpic/_"+_setcode+'/'+_cardname.replace(':', '').replace('"', '')+".jpg";
-	//alert( str );
 	return str;
 }

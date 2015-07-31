@@ -93,7 +93,6 @@ $SearchStmt->execute();
 $SearchResults = $SearchStmt->get_result();
 
 $CardsFound = array();
-$SearchResults->data_seek(0);
 
 $UniqueCardsFound = 0;
 $UniqueCardLimit = 500;
@@ -101,8 +100,6 @@ $UniqueCardLimit = 500;
 while ( $cardArray = $SearchResults->fetch_assoc() )
 {
 	$cardid = $cardArray['cardid'];
-	
-	//print $cardid . " " . $cardArray['name'] . "\n";
 	
 	// If searching for the users cards, remove cards that the user doesn't own
 	if ( $IsLoggedIn && $MyCardsOnly && !array_key_exists($cardid, $MyCardsArray) )
@@ -159,7 +156,6 @@ foreach($SortedCards as $cardname => $cardid)
 	
 	$cardname = $card['name'];
 	$cardname = str_replace( '"', '', $cardname );
-	$cardname = htmlspecialchars( $cardname, ENT_COMPAT );
 	
 	$cardXML = $responseXML->addChild('card');
 	$cardXML->addAttribute( 'name', utf8_encode($cardname) );
@@ -258,7 +254,7 @@ function AppendTextQuery()
 		{
 			$QueryString .= " OR ";
 		}
-		$QueryString .= " (oracle.rules REGEXP ?)";
+		$QueryString .= " (oracle.rules REGEXP ?) ";
 		array_push( $QueryStack, $text );
 		array_push( $QueryFormat,'s' );
 	}
