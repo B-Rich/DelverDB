@@ -65,18 +65,14 @@
 {% endif %}
 {% for set in card.sets %}
 	{% spaceless %}
-	{% if showOwnerships %}
-		{{ set.count }}x
-	{% endif %}
-	<a target='_blank' href="carddetails.php?id={{card.id}}&amp;set={{set.code}}" >
-		<img src="{{ set.symbolurl }}" alt="{{ set.code }}"
-		title="{{ set.name }}"/>
-	</a>
-	{% endspaceless %}
-	{% if showOwnerships and card.sets|length <= 5 %}
-		</br>
-	{% endif %}
-	
+		{% if showOwnerships %}
+			{{ set.count }}x
+		{% endif %}
+		<a target='_blank' href="carddetails.php?id={{card.id}}&amp;set={{set.code}}" >
+			<img src="{{ set.symbolurl }}" alt="{{ set.code }}"
+			title="{{ set.name }}"/>
+		</a>
+	{% endspaceless %} 
 {% endfor %}
 </td>	
 </tr>
