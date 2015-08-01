@@ -51,6 +51,9 @@ if ( $DelverDBLink->connect_errno )
 	die( "Connection error" );
 }
 
+$stmt = $DelverDBLink->prepare( "SET NAMES 'utf8'" ) or die( $DelverDBLink->error );
+$stmt->execute();
+
 $WarningMessages = array();
 $ParamsDisplay = array();
 

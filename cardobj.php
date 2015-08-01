@@ -26,9 +26,9 @@ class Card
 	{
 		$this->id = $cardRow['cardid'];
 		$this->name = $cardRow['name'];
-		$this->name = str_replace('"', '', $this->name);
+		$this->name = str_replace( '"', '', $this->name );
 		$this->cost = $cardRow['cost'];
-		$this->cost = MTGSymbolReplace($this->cost);
+		$this->cost = MTGSymbolReplace( $this->cost );
 
 		$this->type = $cardRow['type'];
 		$this->subtype = $cardRow['subtype'];
@@ -46,7 +46,7 @@ class Card
 		$this->rules = str_replace('~', '</br>', $this->rules);
 		$this->rules = str_replace( '(', '<i>(', $this->rules );
 		$this->rules = str_replace( ')', ')</i>', $this->rules );
-		$this->rules = MTGSymbolReplace($this->rules);
+		$this->rules = MTGSymbolReplace( $this->rules );
 	}
 
 	public function GetlatestSet()
