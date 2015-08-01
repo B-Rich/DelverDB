@@ -1,0 +1,5 @@
+images/
+logs/
+propel/
+.hg/
+passwords.php
