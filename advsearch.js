@@ -34,13 +34,13 @@ function AddParam( _paramType )
 	switch ( boolVal )
 	{
 	case 'and':
-		boolChar  = '&';
+		boolChar  = 'and';
 		break;
 	case 'or':
-		boolChar  = '|';
+		boolChar  = 'or';
 		break;
 	case 'not':
-		boolChar  = '!';
+		boolChar  = 'not';
 		break;
 	default:
 		break;
@@ -57,7 +57,7 @@ function AddParam( _paramType )
 	var pieces;
 	if ( _paramType != "format" && _paramType != "tag" )
 	{
-		pieces = splitstring(paramValue);
+		pieces = splitstring( paramValue );
 	}
 	else
 	{
@@ -105,16 +105,16 @@ function Submit()
 			var param = Parameters[paramType][j];
 			
 			var paramString = param.value;
-			if(param.comparison != undefined)
+			if ( param.comparison != undefined )
 			{
 				paramString = param.comparison + paramString;
 			}
 			
-			if(param.boolean != undefined)
+			if ( param.boolean != undefined )
 			{
-				paramString = param.boolean + paramString;
+				paramString = param.boolean + ':' + paramString;
 			}
-			
+			alert( paramString );
 			$("#parametersform").append("<input name='" + paramType+"[]' type='hidden' value='" + paramString + "' />");
 		}
 	}
@@ -142,7 +142,7 @@ function Submit()
 	}
 	
 	// One of the checkboxes is not selected, send the info
-	if ( colourBits != (1 | 2 | 4 | 8 | 16 ) )
+	if ( colourBits != ( 1 | 2 | 4 | 8 | 16 ) )
 	{
 		$("#parametersform").append("<input name='colouridentity' type='hidden' value='"+colourBits+"' />");
 		++parameterCount;
@@ -195,34 +195,34 @@ function DisplayParameters()
 	for(var paramType in Parameters)
 	{	
 		var displayIndex = ParameterTypes.indexOf(paramType);
-		if(displayIndex == -1)
+		if ( displayIndex == -1 )
 		{
 			alert("Unknown parameter type "+paramType);
 			return;
 		}
 		var displayParam = DisplayParamTypes[displayIndex];
 		
-		ParDOM.append("<a href=\"javascript:void(0)\" onclick=RemoveParameterType('"+paramType+"')>x</a><b>&nbsp;"+displayParam + "</b></br>");
-		for(var paramIndex in Parameters[paramType])
+		ParDOM.append("<a href=\"javascript:void(0)\" onclick=RemoveParameterType('"+paramType+"')>x</a><b>&nbsp;" + displayParam + "</b></br>");
+		for ( var paramIndex in Parameters[paramType] )
 		{
 			++paramCount;
 			var param = Parameters[paramType][paramIndex];
 			
 			ParDOM.append("&nbsp;<a href=\"javascript:void(0)\" onclick=\"RemoveParameterValue('"+paramType+"', '"+param.value+"')\">x</a>&nbsp;");
 			
-			if(param.comparison != undefined)
+			if ( param.comparison != undefined )
 			{
 				switch(param.boolean)
 				{
 				case undefined:
 					break;
-				case '&':
+				case 'and':
 					ParDOM.append("AND is");
 					break;
-				case '|':
+				case 'or':
 					ParDOM.append("OR is");
 					break;
-				case '!':
+				case 'not':
 					ParDOM.append("is NOT");
 					break;
 				}
@@ -234,13 +234,13 @@ function DisplayParameters()
 				{
 				case undefined:
 					break;
-				case '&':
+				case 'and':
 					ParDOM.append("DOES contain ");
 					break;
-				case '|':
+				case 'or':
 					ParDOM.append("OR contains ");
 					break;
-				case '!':
+				case 'not':
 					ParDOM.append("does NOT contain ");
 					break;
 				}

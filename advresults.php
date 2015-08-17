@@ -357,20 +357,20 @@ function VerifyComparisonSymbol($_symbol)
 
 function VerifyBooleanSymbol( $_symbol )
 {
-	return $_symbol == '&'
-		|| $_symbol == '|'
-		|| $_symbol == '!';
+	return $_symbol == 'and'
+		|| $_symbol == 'or'
+		|| $_symbol == 'not';
 }
 
 function BooleanSymbolToSQL( $_symbol )
 {
 	switch ( $_symbol )
 	{
-		case '|':
+		case 'or':
 			return "OR";
-		case '&':
+		case 'and':
 			return "AND";
-		case '!': 
+		case 'not': 
 			return "NOT";
 		default:
 			$WarningMessages[] = "Uncaught boolean converson \"$_symbol\"";
@@ -647,22 +647,22 @@ function CreateQuery( $_allParams )
 			$parameterIndex = 0;
 			foreach ( $parameters as $index => $parameter )
 			{
-				if ( $index != 0 && $parameter->bool != '!' )
+				if ( $index != 0 && $parameter->bool != 'not' )
 				{
 					$query .= ' ' . BooleanSymbolToSQL( $parameter->bool ) . ' ';
 				}
 				
-				if ( $index != 0 && $parameter->bool == '!' )
+				if ( $index != 0 && $parameter->bool == 'not' )
 				{
 					$query .= " AND ";
 				}
 				
-				if ( $parameter->bool == '!' )
+				if ( $parameter->bool == 'not' )
 				{
 					$query .= " NOT ";	
 				}
 				
-				if ( $type == 'colour' && $parameter->bool != '!' )
+				if ( $type == 'colour' && $parameter->bool != 'not' )
 				{
 					$selectedColours[$parameter->argument] = true;
 				}
@@ -913,27 +913,27 @@ function SplitParameterArray( $_allParams, $_paramList, $_parameterType )
 
 function SplitParameter( $_param ) // Returns SearchParameter
 {
-	$Matches = array();
-	preg_match( "/^(?P<bool>[&|!])?(?P<comp>[<=>]{1,3})?(?P<param>.+)$/", $_param, $Matches );
-	if ( array_key_exists('param', $Matches) == false )
+	$matches = array();
+	preg_match( "/^((?P<bool>(and|or|not)):)?(?P<comp>[<=>]{1,3})?(?P<param>.+)$/", $_param, $matches );
+	if ( array_key_exists('param', $matches) == false )
 	{
 		return null;
 	}
 	
-	$param = $Matches['param'];
-	$comp = array_key_exists('comp', $Matches) ? $Matches['comp'] : '';
+	$param = $matches['param'];
+	$comp = array_key_exists('comp', $matches) ? $matches['comp'] : '';
 	
 	if ( $comp != '' && VerifyComparisonSymbol( $comp ) == false )
 	{
 		return null;
 	}
 	
-	if ( array_key_exists('bool', $Matches) == false )
+	if ( array_key_exists('bool', $matches) == false )
 	{
 		return null;	
 	}
 	
-	$bool = $Matches['bool'];
+	$bool = $matches['bool'];
 	
 	if ( VerifyBooleanSymbol( $bool ) == false )
 	{
