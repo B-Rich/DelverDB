@@ -14,7 +14,7 @@ $twig = new Twig_Environment($loader);
 /// HEADER
 
 $SQLUser = $SQLUsers['oracle_search'];
-$DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "magic_db");
+$DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "delverdb");
 if ( $DelverDBLink->connect_errno )
 {
 	$DBLog->err( "Connection error (".$DelverDBLink->connect_errno.") ".$DelverDBLink->connect_error );
@@ -37,7 +37,6 @@ if($IsLoggedIn)
 $args['scripts'] = array
 (
 	'<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>',
-	//'<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.js" ></script>',
 	'<script type="text/javascript" src="common.js" ></script>',
 	'<script type="text/javascript" src="advsearch.js" ></script>'
 );
@@ -101,12 +100,14 @@ $args['parametertypes'][] = new ParameterType( "rules", "Rules Text", true, 'and
 
 /// EXPANSIONS
 $expansions = new ParameterType('expansion', 'Expansion', true, 'or', 'groupselect');
-foreach(Defines::$CardBlocksToSetCodes as $block => $codesarray)
+
+$blocks = ddb\Defines::getBlockList();
+foreach ( $blocks as $block )
 {
-	$optGroup = new OptionGroup($block);
-	foreach($codesarray as $code)
+	$optGroup = new OptionGroup( $block->name );
+	foreach ( $block->sets as $set )
 	{
-		$optGroup->options[] = new Option($code, Defines::$SetCodeToNameMap[$code]);
+		$optGroup->options[] = new Option( $set->code, $set->name );
 	}
 	$expansions->optiongroups[] = $optGroup;
 }
@@ -115,18 +116,19 @@ $args['parametertypes'][] = $expansions;
 
 /// FORMATS
 $formats = new ParameterType('format', 'Format', true, 'or', 'select');
-foreach(Defines::$CardFormats as $format => $codesarray)
+foreach ( $blocks as $block )
 {
-	$formats->options[] = new Option($format, $format);
+	$formats->options[] = new Option( $block->blockid, $block->name );
 }
 
 $args['parametertypes'][] = $formats;
 
 /// COLOURS
 $colours = new ParameterType('colour', 'Colour', true, 'and', 'select');
-foreach(Defines::$ColourNamesToSymbols as $name => $symbol)
+
+foreach ( ddb\Defines::$colourList as $symbol => $colour )
 {
-	$colours->options[] = new Option($symbol, $name);
+	$colours->options[] = new Option($symbol, $colour->name);
 }
 $args['parametertypes'][] = $colours;
 
@@ -138,7 +140,9 @@ $args['parametertypes'][] = new ParameterType("numcolours", "Colour Count", true
 
 /// TYPES
 $types = new ParameterType('type', 'Type', true, 'and', 'select');
-foreach(Defines::$Types as $type)
+
+$typeList = ddb\Defines::getTypeList();
+foreach ( $typeList as $type )
 {
 	$types->options[] = new Option($type, $type);
 }
@@ -146,9 +150,10 @@ $args['parametertypes'][] = $types;
 
 /// SUBTYPES
 $subtypes = new ParameterType('subtype', 'Subtype', true, 'and', 'select');
-foreach(Defines::$Subtypes as $subtype)
+$subtypeList = ddb\Defines::getSubtypeList();
+foreach ( $subtypeList as $subtype )
 {
-	$subtypes->options[] = new Option($subtype, $subtype);
+	$subtypes->options[] = new Option( $subtype, $subtype );
 }
 $args['parametertypes'][] = $subtypes;
 
@@ -166,7 +171,7 @@ $args['parametertypes'][] = new ParameterType("toughness", "Toughness", true, 'o
 
 /// RARITY
 $rarities = new ParameterType('rarity', 'Rarity', true, 'and', 'select');
-foreach(Defines::$RarityNameToSymbol as $name => $symbol)
+foreach ( ddb\Defines::$rarityList as $symbol => $name)
 {
 	$rarities->options[] = new Option( $symbol, $name );
 }

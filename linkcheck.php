@@ -37,7 +37,7 @@ echo $template->render($args);
 /// LINK CHECK
 
 $SQLUser = $SQLUsers['ddb_usercards'];
-$DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "magic_db");
+$DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "delverdb");
 if($DelverDBLink->connect_errno)
 {
 	$DBLog->err("Connection error (".$DelverDBLink->connect_errno.") ".$DelverDBLink->connect_error);

@@ -12,7 +12,7 @@ if(!IsLoggedIn())
 }
 
 $MySQLUser = $SQLUsers['deckmaker'];
-$DelverDBLink = new mysqli("localhost", $MySQLUser->username, $MySQLUser->password, "magic_db");
+$DelverDBLink = new mysqli("localhost", $MySQLUser->username, $MySQLUser->password, "delverdb");
 if($DelverDBLink->connect_errno)
 {
 	$DBLog->error("Error connecting to database ($DelverDBLink->connect_errno): $DelverDBLink->connect_error");

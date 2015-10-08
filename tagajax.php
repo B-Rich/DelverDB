@@ -7,7 +7,7 @@ include_once "passwords.php";
 global $DBLog;
 
 $SQLUser = $SQLUsers['ddb_tagmaker'];
-$DelverDBLink = new mysqli( "localhost", $SQLUser->username, $SQLUser->password, "magic_db" );
+$DelverDBLink = new mysqli( "localhost", $SQLUser->username, $SQLUser->password, "delverdb" );
 
 if ( $DelverDBLink->connect_errno )
 {
@@ -60,7 +60,7 @@ else if ( $_GET["mode"] == "add" || $_GET["mode"] == "remove" )
 	$TagID = $_GET['tagid'];
 	$CardID = $_GET['cardid'];
 	
-	$TagNameStmt = $DelverDBLink->prepare( "SELECT * FROM tags WHERE uid = ?" );
+	$TagNameStmt = $DelverDBLink->prepare( "SELECT * FROM tags WHERE id = ?" );
 	$TagNameStmt->bind_param( "i", $TagID );
 	$TagNameStmt->execute();
 	$TagNameResult = $TagNameStmt->get_result();

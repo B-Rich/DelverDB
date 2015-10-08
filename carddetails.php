@@ -17,7 +17,7 @@ $UserID = $IsLoggedIn == true ? $_SESSION['userid'] : null;
 /// LINK
 
 $SQLUser = $SQLUsers['ddb_usercards'];
-$DelverDBLink = new mysqli( "localhost", $SQLUser->username, $SQLUser->password, "magic_db" );
+$DelverDBLink = new mysqli( "localhost", $SQLUser->username, $SQLUser->password, "delverdb" );
 if ( $DelverDBLink->connect_errno )
 {
 	$errno = $DelverDBLink->connect_errno;
@@ -91,7 +91,7 @@ if ( $IsLoggedIn == true )
 //////////////////////////
 /// SET DATA
 
-$CardSetStmt = $DelverDBLink->prepare( "SELECT setcode, rarity, cnum, artist FROM cardsets WHERE cardid = ?");
+$CardSetStmt = $DelverDBLink->prepare( "SELECT setcode, rarity, collectornum, artist FROM cardsets WHERE cardid = ?");
 $CardSetStmt->bind_param( "i", $CardID );
 $CardSetStmt->execute();
 $CardSetResult = $CardSetStmt->get_result();
@@ -105,7 +105,7 @@ while ( $setRow = $CardSetResult->fetch_assoc() )
 {
 	$set = $setRow['setcode'];
 	$rarity = $setRow['rarity'];
-	$cnum = $setRow['cnum'];
+	$cnum = $setRow['collectornum'];
 	$artist = $setRow['artist'];
 	
 	if ( strcasecmp( $Setcode, $set ) == 0 )

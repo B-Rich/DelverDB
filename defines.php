@@ -1,11 +1,210 @@
 <?php
 
+namespace ddb;
+
+include_once "passwords.php";
+
 define('__DEBUG__', true);
 define('__ERROR_REPORTING__', __DEBUG__ ? -1 : 0);
 error_reporting( __ERROR_REPORTING__ );
 ini_set('display_errors', __DEBUG__ );
 ini_set('log_errors', 1);
 
+abstract class Defines
+{
+	private static $DelverDBLink = null;
+	
+	private static $setList = null;
+	private static $blockList = null;
+	
+	private static $typeList = null;
+	private static $subtypeList = null;
+	
+	public static $colourList;
+	public static $rarityList;
+	
+	private static function openConnection()
+	{
+		global $SQLUsers;
+		
+		if ( Defines::$DelverDBLink != null )
+		{
+			return;	
+		}
+		
+		$user = $SQLUsers['oracle_search'];
+		Defines::$DelverDBLink = new \mysqli("localhost", $user->username, $user->password, "delverdb");
+		if ( Defines::$DelverDBLink->connect_errno )
+		{
+			$DBLog->err( "Connection error (" . Defines::$DelverDBLink->connect_errno . ") " . Defines::$DelverDBLink->connect_error );
+			die( "Connection error" );
+		}
+	}
+	
+	public static function getSetList()
+	{
+		if ( Defines::$setList != null )
+		{
+			return Defines::$setList;
+		}
+		
+		Defines::openConnection();
+		
+		$stmt = Defines::$DelverDBLink->prepare( "SELECT code, name, release_date FROM sets ORDER BY release_date ASC" )
+			 or die( Defines::$DelverDBLink->error );
+		
+		$stmt->execute();
+		$result = $stmt->get_result();
+		Defines::$setList = array();
+		
+		while ( $row = $result->fetch_assoc() )
+		{
+			$set = new Set();
+			$set->code = $row['code'];
+			$set->name = $row['name'];
+			$set->release_date = $row['release_date'];
+			Defines::$setList[$set->code] = $set;
+		}
+		
+		return Defines::$setList;
+	}
+	
+	public static function getBlockList()
+	{
+		if ( Defines::$blockList != null )
+		{
+			return $Defines::$blockList;
+		}
+		
+		Defines::openConnection();
+		
+		$stmt = Defines::$DelverDBLink->prepare( "SELECT b.id blockid, b.name, s.code setcode FROM blocks b JOIN sets s ON s.blockid = b.id ORDER BY b.id ASC, s.id ASC" )
+			or die( Defines::$DelverDBLink->error );
+		$stmt->execute();
+		$result = $stmt->get_result();
+		
+		Defines::$blockList = array();
+		
+		$sets = Defines::getSetList();
+		
+		while ( $row = $result->fetch_assoc() )
+		{
+			$setcode = $row['setcode'];
+			$blockid = $row['blockid'];
+			$block = null;
+			
+			if ( array_key_exists( $blockid, Defines::$blockList ) )
+			{
+				$block = Defines::$blockList[$blockid];
+			}
+			else
+			{
+				$block = new Block();
+				$block->blockid = $blockid;
+				$block->name = $row['name'];	
+				Defines::$blockList[$blockid] = $block;
+			}
+			
+			if ( array_key_exists( $setcode, $sets ) )
+			{
+				$block->sets[] = $sets[$setcode];
+			}
+		}
+		
+		return Defines::$blockList;
+	}
+	
+	public static function getTypeList()
+	{
+		if ( Defines::$typeList != null )
+		{
+			return $Defines::$typeList;
+		}
+	
+		Defines::openConnection();
+		$stmt = Defines::$DelverDBLink->prepare( "SELECT name FROM types ORDER BY name ASC" )
+			or die( Defines::$DelverDBLink->error );
+		$stmt->execute();
+		$result = $stmt->get_result();
+		Defines::$typeList = array();
+	
+		while ( $row = $result->fetch_assoc() )
+		{
+			Defines::$typeList[] = $row['name'];
+		}
+	
+		return Defines::$typeList;
+	}
+	
+	public static function getSubtypeList()
+	{
+		if ( Defines::$subtypeList != null )
+		{
+			return $Defines::$subtypeList;
+		}
+	
+		Defines::openConnection();
+		$stmt = Defines::$DelverDBLink->prepare( "SELECT name FROM subtypes ORDER BY name ASC" )
+			or die( Defines::$DelverDBLink->error );
+		$stmt->execute();
+		$result = $stmt->get_result();
+		Defines::$subtypeList = array();
+	
+		while ( $row = $result->fetch_assoc() )
+		{
+			Defines::$subtypeList[] = $row['name'];
+		}
+	
+		return Defines::$subtypeList;
+	}
+}
+
+class Set
+{
+	public $code;
+	public $name;
+	public $release_date;
+}
+
+class Block
+{
+	public $blockid;
+	public $name;
+	public $sets = array();	
+}
+
+class Colour
+{
+	public $flag;
+	public $name;	
+
+	function __construct( $_name, $_flag )
+	{
+		$this->flag = $_flag;
+		$this->name = $_name;	
+	}
+}
+
+Defines::$colourList = array(
+	'W' => new Colour( 'White', 1 ),
+	'U' => new Colour( 'Blue', 2 ),
+	'B' => new Colour( 'Black', 4 ),
+	'R' => new Colour( 'Red', 8 ),
+	'G' => new Colour( 'Green', 16 ),
+);
+
+Defines::$rarityList = array (
+'L' => 'Land',
+'C' => 'Common',
+'U' => 'Uncommon',
+'R' => 'Rare',
+'M' => 'Mythic',
+'B' => 'Bonus',
+'S' => 'Special',
+);
+
+
+/*
 class Defines
 {
 	static $SetCodeToNameMap;
@@ -450,5 +649,5 @@ Defines::$RarityNameToSymbol = array (
 	'Special' => 'S',
 );
 
-Defines::$RaritySymbolToName = array_flip( Defines::$RarityNameToSymbol );
+Defines::$RaritySymbolToName = array_flip( Defines::$RarityNameToSymbol );*/
 ?>

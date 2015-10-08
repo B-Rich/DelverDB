@@ -5,7 +5,7 @@ include_once "defines.php";
 //include_once "users.php";
 
 $SQLUser = $SQLUsers['oracle_search'];
-$DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "magic_db");
+$DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "delverdb");
 if ( $DelverDBLink->connect_errno )
 {
 	$str = "Database connection failure ($DelverDBLink->connect_errno): $DelverDBLink->connect_error";

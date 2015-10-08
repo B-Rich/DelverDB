@@ -40,7 +40,7 @@ if(count($_GET['id']) != count($_GET['count']))
 }
 
 $SQLUser = $SQLUsers['deckmaker'];
-$DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "magic_db");
+$DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "delverdb");
 
 if($DelverDBLink->connect_errno)
 {

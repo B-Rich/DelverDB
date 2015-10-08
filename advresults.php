@@ -44,7 +44,7 @@ echo $template->render( $args );
 /// SEARCH RESULTS
 
 $SQLUser = $SQLUsers['oracle_search'];
-$DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "magic_db");
+$DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "delverdb");
 if ( $DelverDBLink->connect_errno )
 {
 	$DBLog->err( "Connection error (".$DelverDBLink->connect_errno.") ".$DelverDBLink->connect_error );
@@ -107,7 +107,7 @@ for ( $i = 0; $i < $StackCount; ++$i )
 /// Merge the arrays together
 array_unshift( $StackCopy, implode( $QueryFormat ) );
 
-$SearchStmt = $DelverDBLink->prepare( "SELECT DISTINCT oracle.cardid " . $QueryString );
+$SearchStmt = $DelverDBLink->prepare( "SELECT DISTINCT cards.id " . $QueryString );
 if ( $SearchStmt == null )
 {
 	$SearchLog->log( "Error preparing statement \"$QueryString\": $DelverDBLink->error" );
@@ -129,7 +129,7 @@ if ( $SearchResults == null )
 $CardIDArray = array();
 while ( $row = $SearchResults->fetch_assoc() )
 {
-	$CardIDArray[] = $row['cardid'];
+	$CardIDArray[] = $row['id'];
 }
 
 $CardCountStmt = null;
@@ -220,12 +220,12 @@ $TemplateArgs['pageURL'] = $url;
 $TemplateArgs['pageOffset'] = 3;
 $TemplateArgs['cardCount'] = $CardCount;
 
-$OracleDataStmt = $DelverDBLink->prepare( "SELECT * FROM oracle WHERE cardid = ?");
-$CardSetStmt = $DelverDBLink->prepare( "SELECT DISTINCT setcode, rarity, cnum, artist FROM cardsets WHERE cardid = ?");
+$OracleDataStmt = $DelverDBLink->prepare( "SELECT * FROM cards WHERE cards.id = ?")  or die( $DelverDBLink->error );
+$CardSetStmt = $DelverDBLink->prepare( "SELECT DISTINCT setcode, rarity, multiverseid, collectornum, artist FROM cardsets WHERE cardid = ?") or die( $DelverDBLink->error );
 $CardTagStmt = $DelverDBLink->prepare( "SELECT tags.name, taglinks.tagid FROM taglinks
-		INNER JOIN tags ON taglinks.tagid = tags.uid 
-		WHERE taglinks.cardid = ?" );
-$TagListStmt = $DelverDBLink->prepare( "SELECT uid, name FROM tags" );
+		INNER JOIN tags ON taglinks.tagid = tags.id 
+		WHERE taglinks.cardid = ?" ) or die( $DelverDBLink->error );
+$TagListStmt = $DelverDBLink->prepare( "SELECT id, name FROM tags" ) or die( $DelverDBLink->error );
 
 $MyCardsOnly = ( IsLoggedIn() && array_key_exists('mycards', $_GET) && $_GET['mycards'] != '0' );
 
@@ -247,7 +247,7 @@ for ( $CardIndex = 0; $CardIndex < $CardCount; ++$CardIndex )
 		continue;
 	}
 	
-	$OracleDataStmt->bind_param( 'i', $cardID );
+	$OracleDataStmt->bind_param( 'i', $cardID ) or die( $DelverDBLink->error );
 	$OracleDataStmt->execute();
 	$oracleResult = $OracleDataStmt->get_result();
 	$oracleRow = $oracleResult->fetch_assoc();
@@ -275,8 +275,9 @@ for ( $CardIndex = 0; $CardIndex < $CardCount; ++$CardIndex )
 	{
 		$setcode = $setRow['setcode'];
 		$rarity = $setRow['rarity'];
-		$cnum = $setRow['cnum'];
+		$cnum = $setRow['collectornum'];
 		$artist = $setRow['artist'];
+		$multiverseid = $setRow['multiverseid'];
 		
 		$count = 0;
 		/// Use the count if the user is logged in, and owns the card
@@ -286,7 +287,7 @@ for ( $CardIndex = 0; $CardIndex < $CardCount; ++$CardIndex )
 		{
 			$count = $UserCardArray[$cardID][$setcode];
 		}
-		$completeCard->AddSet( $setcode, $rarity, $cnum, $artist, $count );
+		$completeCard->AddSet( $setcode, $rarity, $cnum, $artist, $count, $multiverseid );
 	}
 	$completeCard->imageurl = $completeCard->GetFirstImageURL();
 
@@ -312,7 +313,7 @@ $TagListResult = $TagListStmt->get_result();
 $TemplateArgs['tags'] = array();
 while ( $row = $TagListResult->fetch_assoc() )
 {
-	$TemplateArgs['tags'][] = array( "id" => $row['uid'], "name" => $row['name'] );
+	$TemplateArgs['tags'][] = array( "id" => $row['id'], "name" => $row['name'] );
 }
 
 $TwigTemplate = $twig->loadTemplate( 'advresults.twig' );
@@ -434,7 +435,7 @@ function colourCardMatch($colour, $comp)
 	$bitflag = Defines::$ColourSymbolsToInt[$colour];
 	array_push($QueryStack, $bitflag);
 	array_push($QueryFormat, "i");
-	return " (oracle.colour & ?) ";
+	return " (cards.colour & ?) ";
 }
 
 function colouridCardMatch( $colourid, $comp )
@@ -449,7 +450,7 @@ function colouridCardMatch( $colourid, $comp )
 	$bitflag = Defines::$ColourSymbolsToInt[$colourid];
 	array_push($QueryStack, $bitflag);
 	array_push($QueryFormat, "i");
-	return " (oracle.colouridentity & ?) ";
+	return " (cards.colouridentity & ?) ";
 }
 
 function numcoloursCardMatch( $numcolours, $comp )
@@ -468,7 +469,7 @@ function numcoloursCardMatch( $numcolours, $comp )
 	}
 	array_push( $QueryStack, $numcolours );
 	array_push( $QueryFormat, "i" );
-	return " (oracle.numcolours $comp ?) ";
+	return " (cards.numcolours $comp ?) ";
 }
 
 function typeCardMatch($type, $comp)
@@ -476,14 +477,14 @@ function typeCardMatch($type, $comp)
 	global $QueryStack, $QueryFormat, $ParamsDisplay;
 	array_push( $QueryStack, "%$type%" );
 	array_push( $QueryFormat, "s" );
-	return " ( oracle.type IS NOT NULL AND oracle.type LIKE ?) ";
+	return " ( cards.type IS NOT NULL AND cards.type LIKE ?) ";
 }
 function subtypeCardMatch($subtype, $comp)
 {
 	global $QueryStack, $QueryFormat, $ParamsDisplay;
 	array_push($QueryStack, "%$subtype%");
 	array_push($QueryFormat, "s");
-	return " ( oracle.subtype IS NOT NULL AND oracle.subtype LIKE ? ) ";
+	return " ( cards.subtype IS NOT NULL AND cards.subtype LIKE ? ) ";
 }
 
 function costCardMatch($cost, $comp)
@@ -491,7 +492,7 @@ function costCardMatch($cost, $comp)
 	global $QueryStack, $QueryFormat, $ParamsDisplay;
 	array_push( $QueryStack, "%$cost%" );
 	array_push( $QueryFormat, "s" );
-	return "(oracle.cost IS NOT NULL AND oracle.cost LIKE ? )";
+	return "(cards.cost IS NOT NULL AND cards.cost LIKE ? )";
 }
 
 function cmcCardMatch($cmc, $comp)
@@ -510,7 +511,7 @@ function cmcCardMatch($cmc, $comp)
 	}
 	array_push($QueryStack, $cmc);
 	array_push($QueryFormat, "i");
-	return " (oracle.cmc $comp ?) ";
+	return " (cards.cmc $comp ?) ";
 }
 
 function powerCardMatch($power, $comp)
@@ -528,7 +529,7 @@ function powerCardMatch($power, $comp)
 	}
 	array_push($QueryStack, $power);
 	array_push($QueryFormat, "i");
-	return " (oracle.power IS NOT NULL AND oracle.numpower $comp ?) ";
+	return " (cards.power IS NOT NULL AND cards.numpower $comp ?) ";
 }
 
 function toughnessCardMatch($toughness, $comp)
@@ -547,7 +548,7 @@ function toughnessCardMatch($toughness, $comp)
 	
 	array_push($QueryStack, $toughness);
 	array_push($QueryFormat, "i");
-	return " (oracle.toughness IS NOT NULL AND oracle.numtoughness $comp ?) ";
+	return " (cards.toughness IS NOT NULL AND cards.numtoughness $comp ?) ";
 }
 
 function rarityCardMatch($rarity, $comp)
@@ -604,11 +605,11 @@ function CreateQuery( $_allParams )
 	  || array_key_exists( 'rarity', $_GET )
 	  || array_key_exists( 'artist', $_GET ) )
 	{
-		$query = " FROM oracle INNER JOIN cardsets ON oracle.cardid = cardsets.cardid ";
+		$query = " FROM cards INNER JOIN cardsets ON cards.id = cardsets.cardid ";
 	}
 	else // Otherwise, we don't need the cardsets table joined on
 	{
-		$query = " FROM oracle ";
+		$query = " FROM cards ";
 	}
 	
 	$paramCount = 0;
@@ -697,7 +698,7 @@ function CreateQuery( $_allParams )
 		{
 			$query .= " AND ";
 		}
-		$query .= " (BIT_COUNT(oracle.colour) > 1) ";
+		$query .= " (cards.numcolours > 1) ";
 		$HashQueryChanged = true;
 	}
 
@@ -724,7 +725,7 @@ function CreateQuery( $_allParams )
 				$query .= " AND ";
 			}
 			
-			$query .= " ( (oracle.colour & $colourFlags) = 0 ) ";
+			$query .= " ( (cards.colour & $colourFlags) = 0 ) ";
 			$HashQueryChanged = true;
 		}
 
@@ -739,7 +740,7 @@ function CreateQuery( $_allParams )
 		}
 		
 		$otherColours = ~($_allParams->colourIdentity + 0);
-		$query .= " ( oracle.colouridentity & $otherColours = 0 ) ";
+		$query .= " ( cards.colouridentity & $otherColours = 0 ) ";
 		$HashQueryChanged = true;
 	}
 
@@ -759,12 +760,12 @@ function CreateSQLOrderString( $_allParams )
 	$query = " ORDER BY ";
 	
 	$SortConversion = array(
-		'name' => 'oracle.name',
-		'id' => 'oracle.cardid',
-		'cmc' => 'oracle.cmc',
-		'power' => 'oracle.numpower',
-		'toughness' => 'oracle.numtoughness',
-		'type' => 'oracle.type',
+		'name' => 'cards.name',
+		'id' => 'cards.id',
+		'cmc' => 'cards.cmc',
+		'power' => 'cards.numpower',
+		'toughness' => 'cards.numtoughness',
+		'type' => 'cards.type',
 	);
 	
 	foreach ( $_allParams->sortParameters as $str )
@@ -1057,7 +1058,7 @@ function RemoveUserCountMatches()
 function FindTagIDs()
 {
 	global $DelverDBLink;
-	$TagNameStmt = $DelverDBLink->prepare( "SELECT uid FROM tags WHERE name = ?" );
+	$TagNameStmt = $DelverDBLink->prepare( "SELECT id FROM tags WHERE name = ?" );
 	
 	$TagIDList = array();
 	
@@ -1071,7 +1072,7 @@ function FindTagIDs()
 		{
 			continue;
 		}
-		$tagID = $row['uid'];
+		$tagID = $row['id'];
 		$TagIDList[] = $tagID;
 	}
 	return $TagIDList;

@@ -15,7 +15,7 @@ $UserID = $IsLoggedIn == true ? $_SESSION['userid'] : null;
 /// LINK
 
 $SQLUser = $SQLUsers['deckmaker'];
-$DelverDBLink = new mysqli( "localhost", $SQLUser->username, $SQLUser->password, "magic_db" );
+$DelverDBLink = new mysqli( "localhost", $SQLUser->username, $SQLUser->password, "delverdb" );
 if ( $DelverDBLink->connect_errno )
 {
 	$errno = $DelverDBLink->connect_errno;

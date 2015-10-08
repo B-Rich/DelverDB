@@ -40,7 +40,7 @@ if($IsLoggedIn && array_key_exists('edit', $_GET))
 	$DeckLog->log("Starting deck load for modification by user $userID");
 	
 	$SQLUser = $SQLUsers['deckmaker'];
-	$DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "magic_db");
+	$DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "delverdb");
 	
 	if($DelverDBLink->connect_errno)
 	{

@@ -9,7 +9,7 @@ include_once "output.php";
 global $DBLog, $CardLog, $UserLog;
 
 $SQLUser = $SQLUsers['oracle_search'];
-$DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "magic_db");
+$DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "delverdb");
 
 if(!array_key_exists('cardname', $_GET))
 {

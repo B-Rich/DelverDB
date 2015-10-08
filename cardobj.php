@@ -24,7 +24,7 @@ class Card
 
 	public function ConstructFromResults( $cardRow )
 	{
-		$this->id = $cardRow['cardid'];
+		$this->id = $cardRow['id'];
 		$this->name = $cardRow['name'];
 		$this->name = str_replace( '"', '', $this->name );
 		$this->cost = $cardRow['cost'];
@@ -80,25 +80,27 @@ class Card
 
 	public function GetImageURLInSet( $_setcode )
 	{
-		$replacements = array('"', '|', '<', '>', '?', '\\', '/', '*', ':');
-		$cardname = str_replace($replacements, "", $this->name);
-
-		$imgurl = "images/cardpic/_".$_setcode."/$cardname.jpg";
-		$imgurl = str_replace(' ', '%20', $imgurl);
+		$key = array_search($_setcode, array_column($this->sets, 'code'));
+		$set = $this->sets[$key];
+		$imgurl = "images/cards/".$set->multiverseid.".png";
 		return $imgurl;
 	}
-
-	public function AddSet( $_setcode, $_rarity, $cnum, $artist, $_count )
+	
+	public function AddSet( $_setcode, $_rarity, $cnum, $artist, $_count, $_multiverseid )
 	{
 		$this->total += $_count;
 		$set = new Set();
 		$set->code = $_setcode;
-		$set->name = Defines::$SetCodeToNameMap[$_setcode];
+		if ( array_key_exists( $_setcode, Defines::$SetCodeToNameMap ) )
+		{
+			$set->name = Defines::$SetCodeToNameMap[$_setcode];
+		}
+		
 		$set->rarity = $_rarity;
 		$set->cnum = $cnum;
 		$set->artist = $artist;
-		$set->imageurl = $this->GetImageURLInSet($_setcode);
-
+		$set->multiverseid = $_multiverseid;
+		
 		$set->count = $_count;
 		$set->symbolurl = "images/exp/".$_setcode.'_'.$_rarity.'_small.jpg';
 		$this->sets[] = $set;
@@ -109,12 +111,11 @@ class Set
 {
 	public $code;
 	public $name;
-	public $imageurl;
+	public $multiverseid;
 	public $rarity;
 	public $cnum;
 	public $artist;
 	public $count;
-	public $symbolurl;
 };
 
 ?>

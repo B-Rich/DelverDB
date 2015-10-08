@@ -9,7 +9,7 @@ include_once "output.php";
 global $DBLog, $CardLog, $UserLog;
 
 $SQLUser = $SQLUsers['ddb_usercards'];
-$DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "magic_db");
+$DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "delverdb");
 
 if($DelverDBLink->connect_errno)
 {
