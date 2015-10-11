@@ -51,16 +51,16 @@ class set
 	public $setcode;
 };
 
-foreach(Defines::$CardBlocksToSetCodes as $blockname => $setcodes)
-{
-	$block = new block();
-	$block->name = $blockname;
-	foreach($setcodes as $setcode)
+$blocks = ddb\Defines::GetBlockList();
+
+foreach ( $blocks as $blockid => $block )
+{	
+	foreach ( $block->sets as $set )
 	{
-		$set = new set();
-		$set->setcode = $setcode;
-		$set->name = Defines::$SetCodeToNameMap[$setcode];
-		$block->sets[] = $set;
+		$setArg = new set();
+		$setArg->setcode = $set->code;
+		$setArg->name = $set->name;
+		$block->sets[] = $setArg;
 	}
 	$args['blocks'][] = $block;
 }

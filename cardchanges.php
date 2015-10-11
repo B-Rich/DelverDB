@@ -54,13 +54,13 @@ $UserID = $_SESSION['userid'];
 /// CARD CHANGES
 
 
-$CardLogStmt = $DelverDBLink->prepare("SELECT cardid, setcode, datemodified, difference FROM usercardlog
+$CardLogStmt = $DelverDBLink->prepare("SELECT cardid, setcode, datemodified, difference FROM usercardchanges
 		 WHERE userid = $UserID ORDER BY datemodified DESC");
 
 $CardLogStmt->execute();
 $CardLogResults = $CardLogStmt->get_result();
 
-$CardOracleStmt = $DelverDBLink->prepare( "SELECT name FROM oracle WHERE cardid = ?" );
+$CardOracleStmt = $DelverDBLink->prepare( "SELECT name FROM cards WHERE id = ?" );
 
 
 $PageNumber = 0;

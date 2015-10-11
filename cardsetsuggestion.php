@@ -19,9 +19,9 @@ if(!array_key_exists('cardname', $_GET))
 $CardName = $_GET['cardname'];
 
 $SearchStmt = $DelverDBLink->prepare("
-		SELECT DISTINCT cardsets.setcode FROM oracle, cardsets
-		WHERE oracle.name = ?
-		AND oracle.cardid = cardsets.cardid");
+		SELECT DISTINCT cardsets.setcode FROM cards, cardsets
+		WHERE cards.name = ?
+		AND cards.id = cardsets.cardid");
 
 $SearchStmt->bind_param("s", $CardName);
 $SearchStmt->execute();
@@ -30,12 +30,14 @@ $SearchResult = $SearchStmt->get_result();
 $xmlstr = "<response></response>";
 $response = new SimpleXMLElement($xmlstr);
 
+$sets = ddb\Defines::getSetList();
+
 while($row = $SearchResult->fetch_assoc())
 {
 	$card = $response->addChild("set");
 	$setcode = $row['setcode'];
 	$card->addAttribute('code', $setcode);
-	$card->addAttribute('name', Defines::$SetCodeToNameMap[$setcode]);
+	$card->addAttribute('name', $sets[$setcode]->name);
 }
 
 echo $response->asXML();

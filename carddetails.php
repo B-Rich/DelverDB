@@ -11,8 +11,6 @@ global $IsLoggedIn, $LoginErrorMessage;
 
 $UserID = $IsLoggedIn == true ? $_SESSION['userid'] : null;
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 /// LINK
 
@@ -49,8 +47,8 @@ $CardObj = new Card();
 /////////////
 /// ORACLE DATA
 
-$OracleDataStmt = $DelverDBLink->prepare( "SELECT * FROM oracle WHERE cardid = ?" ) or die();
-$OracleDataStmt->bind_param( "i", $CardID ) or die();
+$OracleDataStmt = $DelverDBLink->prepare( "SELECT * FROM cards WHERE id = ?" ) or die( $DelverDBLink->error );
+$OracleDataStmt->bind_param( "i", $CardID ) or die( $DelverDBLink->error );
 $OracleDataStmt->execute();
 
 $OracleResult = $OracleDataStmt->get_result();
@@ -91,7 +89,7 @@ if ( $IsLoggedIn == true )
 //////////////////////////
 /// SET DATA
 
-$CardSetStmt = $DelverDBLink->prepare( "SELECT setcode, rarity, collectornum, artist FROM cardsets WHERE cardid = ?");
+$CardSetStmt = $DelverDBLink->prepare( "SELECT setcode, rarity, collectornum, artist, multiverseid FROM cardsets WHERE cardid = ?");
 $CardSetStmt->bind_param( "i", $CardID );
 $CardSetStmt->execute();
 $CardSetResult = $CardSetStmt->get_result();
@@ -107,6 +105,7 @@ while ( $setRow = $CardSetResult->fetch_assoc() )
 	$rarity = $setRow['rarity'];
 	$cnum = $setRow['collectornum'];
 	$artist = $setRow['artist'];
+	$multiverseid = $setRow['multiverseid'];
 	
 	if ( strcasecmp( $Setcode, $set ) == 0 )
 	{
@@ -120,14 +119,14 @@ while ( $setRow = $CardSetResult->fetch_assoc() )
 	{
 		$count = $OwnershipArray[$set];
 	}
-	$CardObj->AddSet( $set, $rarity, $cnum, $artist, $count );
+	$CardObj->AddSet( $set, $rarity, $cnum, $artist, $count, $multiverseid );
 	++$index;
 }
 $CardObj->imageurl = $CardObj->GetFirstImageURL();
 
 $SelectedSet = $CardObj->sets[$SelectedSetIndex];
 $RaritySymbol = $SelectedSet->rarity;
-$RarityString = Defines::$RaritySymbolToName[$RaritySymbol];
+$RarityString = ddb\Defines::$rarityList[$RaritySymbol];
 
 $ArtistString = $SelectedSet->artist;
 $ArtistSearchURL = "advresults.php?artist[]=".urlencode("&".$ArtistString);
@@ -141,12 +140,14 @@ $CardChanges = array();
 if ( $IsLoggedIn && $OwnershipArray != null )
 {
 	$CardChangeStmt = $DelverDBLink->prepare(
-			"SELECT setcode, datemodified, difference FROM usercardlog
+			"SELECT setcode, datemodified, difference FROM usercardchanges
 			WHERE userid = ? AND cardid = ? ORDER BY datemodified DESC") or die( $DelverDBLink->error );
 	
 	$CardChangeStmt->bind_param( "ii", $UserID, $CardID ) or die();
 	$CardChangeStmt->execute() or die();
 	$CardChangeResult = $CardChangeStmt->get_result();
+	
+	$sets = ddb\Defines::getSetList();
 	
 	$Total = 0;
 	while ( $row = $CardChangeResult->fetch_assoc() )
@@ -154,11 +155,7 @@ if ( $IsLoggedIn && $OwnershipArray != null )
 		$change = new Change();
 		
 		$setcode = $row['setcode'];
-		if ( array_key_exists( $setcode, Defines::$SetCodeToNameMap ) == false )
-		{
-			die( "Unknown set code $setcode" );	
-		}
-		$setname = Defines::$SetCodeToNameMap[ $setcode ];
+		$setname = $sets[$setcode]->name;
 		
 		$change->date = $row["datemodified"];
 		$change->difference = $row["difference"];

@@ -55,13 +55,16 @@ var CheckboxNames = new Array
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// OBJECTS
-function DeckCard(_name, _setcode, _id, _count, _numOwn)
+function DeckCard(_name, _setcode, _id, _count, _numOwn, _multiverseid)
 {
+	"use strict";
+	
 	this.name = _name;
 	this.setcode = _setcode;
 	this.id = _id;
 	this.count = _count;
 	this.numOwn = _numOwn;
+	this.multiverseid = _multiverseid;
 }
 
 function Card(_id, _name)
@@ -72,19 +75,23 @@ function Card(_id, _name)
 	this.totalCount;
 	this.sets = new Array();
 	
-	this.GetFirstSetcode = GetFirstSetcode;
-	function GetFirstSetcode()
+	this.GetFirstSet = GetFirstSet;
+	function GetFirstSet()
 	{
-		return this.sets[0].setcode;
+		for ( var i in this.sets )
+		{
+			return this.sets[i];
+		}
 	}
 }
 
-function Set(_setcode, _rarity, _count)
+function Set(_setcode, _rarity, _count, _multiverseid)
 {
 	"use strict";
 	this.setcode = _setcode;
 	this.rarity = _rarity;
 	this.count = _count;
+	this.multiverseid = _multiverseid;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -248,10 +255,11 @@ function SendSearchRequest()
 					
 					var rarity = setattrs.getNamedItem('rarity').value;
 					var count = parseInt(setattrs.getNamedItem('count').value);
+					var multiverseid = setattrs.getNamedItem('multiverseid').value;
 					totalCount += count;
 					
-					var setObj = new Set(setcode, rarity, count);
-					cardObj.sets.push(setObj);
+					var setObj = new Set(setcode, rarity, count, multiverseid);
+					cardObj.sets[setcode] = setObj;
 				}
 			}
 			DisplaySearchResults();
@@ -270,13 +278,13 @@ function DisplaySearchResults()
 	$("#searchResultDiv").html("");
 	for(var cardid in CardResults)
 	{
-		var setcode = CardResults[cardid].GetFirstSetcode();
-		var cardname = CardResults[cardid].name;
+		var card = CardResults[cardid];
+		var set = card.GetFirstSet();
 		
-		var html = '<img src="' + GetCardImageFilename( cardname, setcode ) + '"\
-			alt="'+cardname+'" \
+		var html = '<img src="' + GetCardImageURL( set.multiverseid ) + '"\
+			alt="'+card.name+'" \
 			class="CardImageInWindow" \
-			title="'+cardname+'" \
+			title="'+card.name+'" \
 			onclick="SelectSearchCard('+cardid+')" /> ';
 		
 		$("#searchResultDiv").append( html );
@@ -295,13 +303,7 @@ function SelectSearchCard( _cardid )
 	
 	var card = CardResults[_cardid];
 	var cardname = card.name;
-	if ( card.sets.length == 0 )
-	{
-		DisplayMessage( cardname + " does not have any set information attached." );
-		return;
-	}
-	
-	var setcode = card.GetFirstSetcode();
+	var setcode = card.GetFirstSet().setcode;
 	ChangeSetOfCardPreview( setcode );
 	if ( PageMode == "Search" )
 	{
@@ -347,36 +349,32 @@ function DisplayCardSets()
 	}
 	
 	var card = CardResults[SelectedCardID];
-	if(card.sets.length == 0)
-	{
-		DisplayMessage(card.name +" does not contain any set information.");
-		return;
-	}
 	
 	if(IsLoggedIn)
 	{
 		SetCardOwnershipTotal(card.totalCount);
 	}
 	
-	for(var index in card.sets)
+	var first = true;
+	for ( var setcode in card.sets )
 	{
-		var setcode = card.sets[index].setcode;
-		var rarity = card.sets[index].rarity;
-		var setimg = GetSetIconURL(setcode, rarity);
-		var count = card.sets[index].count;
+		var set = card.sets[setcode];
+		var setimg = GetSetIconURL(set.setcode, set.rarity);
 		
 		var str = "";
-		str += "<label onclick=\"ChangeSetOfCardPreview('"+setcode+"')\" title='"+setcode+"' >";
+		str += "<label onclick=\"ChangeSetOfCardPreview('"+set.setcode+"')\" title='"+set.setcode+"' >";
 		str += "<input type='radio' " +
 				"name='exp' " +
-				"id='expRadio"+setcode+"'"+
-				(index==0?'checked="checked"':'') + 
-				"value='"+setcode+"' /> ";
-		str += "<span id='expSpan"+setcode+"'><img src='"+setimg+"' alt='"+setcode+"' />";
+				"id='expRadio"+set.setcode+"'"+
+				(first?'checked="checked"':'') + 
+				"value='"+set.setcode+"' /> ";
+		str += "<span id='expSpan"+set.setcode+"'><img src='"+setimg+"' alt='"+set.setcode+"' />";
+		
+		first = false;
 		
 		if(IsLoggedIn)
 		{
-			str += ": "+count;
+			str += ": " + set.count;
 		}
 		str += "</span>";
 		
@@ -398,13 +396,16 @@ function ChangeSetOfCardPreview( _setcode )
 {
 	"use strict";
 	var cardname = undefined;
+	var multiverseid = undefined;
 	if ( SelectedCardID in CardResults )
 	{ 
 		cardname = CardResults[SelectedCardID].name;
+		multiverseid = CardResults[SelectedCardID].sets[_setcode].multiverseid;
 	}
 	else if(PageMode == "CreateDeck" && SelectedCardID in DeckContents)
 	{
 		cardname = DeckContents[SelectedCardID].name;
+		multiverseid = DeckContents[SelectedCardID].multiverseid;
 	}
 	else
 	{
@@ -415,7 +416,7 @@ function ChangeSetOfCardPreview( _setcode )
 	$("#SelectedCardLink").prop('href', 
 			'carddetails.php?id=' + SelectedCardID + "&set=" + _setcode );
 	
-	var imgurl = GetCardImageFilename( cardname, _setcode );
+	var imgurl = GetCardImageURL( multiverseid );
 	imgurl = $("<div/>").html(imgurl).text();
 	$("#SelectedCardImg").prop( "src", imgurl );
 }
@@ -693,7 +694,7 @@ function AddCardToDeck()
 		var newCard = new DeckCard();
 		newCard.count = 1;
 		newCard.name = foundCard.name;
-		newCard.setcode = foundCard.GetFirstSetcode();
+		newCard.setcode = foundCard.GetFirstSet().setcode;
 		newCard.id = SelectedCardID;
 		newCard.numOwn = foundCard.totalCount;
 		DeckContents[SelectedCardID] = newCard;

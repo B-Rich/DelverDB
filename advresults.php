@@ -402,13 +402,16 @@ function formatCardMatch($format, $comp)
 	global $QueryStack, $QueryFormat, $WarningMessages, $ParamsDisplay;
 	$str = "(";
 	
-	if(!array_key_exists($format, Defines::$CardFormats))
+	$blocks = ddb\Defines::getBlockList();
+	
+	if ( !array_key_exists( $format, $blocks ) )
 	{
 		$WarningMessages[] = "Unrecognised format '$format' used.";
 		return " FALSE ";
 	}
 	
-	$sets = Defines::$CardFormats[$format];
+	$block = $blocks[$format];
+	$sets = $block->sets;
 	$count = 0;
 	foreach($sets as $set)
 	{
@@ -426,13 +429,14 @@ function formatCardMatch($format, $comp)
 function colourCardMatch($colour, $comp)
 {
 	global $QueryStack, $QueryFormat, $WarningMessages, $ParamsDisplay, $ParamsDisplay;
-	if(!array_key_exists($colour, Defines::$ColourSymbolsToInt))
+	
+	if ( $array_key_exists( $colour, ddb\Defines::$colourList ) )
 	{
 		$WarningMessages[] = "Unrecognised colour '$colour' used.";
 		return " ( FALSE ) ";
 	}
 	
-	$bitflag = Defines::$ColourSymbolsToInt[$colour];
+	$bitflag = ddb\Defines::$colouRList[$colour]->flag;
 	array_push($QueryStack, $bitflag);
 	array_push($QueryFormat, "i");
 	return " (cards.colour & ?) ";
@@ -1113,4 +1117,3 @@ class SearchParameter
 	public $bool;
 	public $argument;
 }
-?>

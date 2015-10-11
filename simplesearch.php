@@ -29,7 +29,6 @@ if($IsLoggedIn)
 $args['scripts'] = array
 (
 	'<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>',
-	//'<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.js" ></script>',
 	'<script type="text/javascript" src="common.js" ></script>',
 	'<script type="text/javascript">
 		var IsLoggedIn = '.($IsLoggedIn ? "true" : "false").';

@@ -19,19 +19,9 @@ function CreateSearchArea($twig, $args)
 		public $setcode;
 	};
 	
-	foreach(Defines::$CardBlocksToSetCodes as $blockname => $setcodes)
-	{
-		$block = new block();
-		$block->name = $blockname;
-		foreach($setcodes as $setcode)
-		{
-			$set = new set();
-			$set->setcode = $setcode;
-			$set->name = Defines::$SetCodeToNameMap[$setcode];
-			$block->sets[] = $set;
-		}
-		$args['blocks'][] = $block;
-	}
+	
+	$blocks = ddb\Defines::getBlockList();
+	$args['blocks'] = array_reverse( $blocks );
 	
 	$types = array
 	(

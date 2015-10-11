@@ -77,12 +77,14 @@ if(!array_key_exists('setcode', $_GET))
 }
 
 $setcode = $_GET['setcode'];
-if(!array_key_exists($setcode, Defines::$SetCodeToNameMap))
+
+$sets = ddb\Defines::getSetList();
+if ( !array_key_exists( $setcode, $sets ) )
 {
 	$CardLog->warning("Invalid setcode: ".$setcode);
 	ReturnXML(7, "Invalid setcode: $setcode");
 }
-$setname = Defines::$SetCodeToNameMap[$setcode];
+$setname = $sets[$setcode]->name;
 
 if($cardname != null)
 {
@@ -206,7 +208,7 @@ exit;
 function FindCardName()
 {
 	global $DelverDBLink, $userid, $cardid, $setcode, $DBLog, $CardLog;
-	$stmt = $DelverDBLink->prepare("SELECT * FROM oracle WHERE cardid = ?");
+	$stmt = $DelverDBLink->prepare("SELECT * FROM cards WHERE id = ?") or die( $DelverDBLink->error );
 	
 	$stmt->bind_param("i", $cardid);
 	$stmt->execute();
@@ -225,7 +227,7 @@ function FindCardName()
 function FindCardID()
 {
 	global $DelverDBLink, $cardname, $DBLog, $CardLog;
-	$stmt = $DelverDBLink->prepare(" SELECT * FROM oracle WHERE name = ? ");
+	$stmt = $DelverDBLink->prepare(" SELECT id, name FROM cards WHERE name = ? ") or die ( $DelverDBLink->error );
 	
 	$stmt->bind_param("s", $cardname);
 	$stmt->execute();
@@ -236,7 +238,7 @@ function FindCardID()
 		ReturnXML(11, "\"".utf8_encode($cardname)."\" is not a card");
 	}
 	$row = $result->fetch_assoc();
-	$id = $row['cardid'];	
+	$id = $row['id'];	
 	$cardname = $row['name'];
 	return $id;
 }
@@ -244,7 +246,7 @@ function FindCardID()
 function ConfirmCardIsInSet()
 {
 	global $DelverDBLink, $userid, $cardid, $setcode, $setname, $cardname, $DBLog, $CardLog;
-	$stmt = $DelverDBLink->prepare("SELECT * FROM oracle, cardsets WHERE oracle.cardid = cardsets.cardid AND oracle.cardid = ? AND cardsets.setcode = ?");
+	$stmt = $DelverDBLink->prepare("SELECT cards.id FROM cards, cardsets WHERE cards.id = cardsets.cardid AND cards.id = ? AND cardsets.setcode = ?") or die( $DelverDBLink->error );
 	
 	$stmt->bind_param("is", $cardid, $setcode);
 	$stmt->execute();
@@ -259,7 +261,7 @@ function ConfirmCardIsInSet()
 function ExistingCardCount()
 {
 	global $DelverDBLink, $userid, $cardid, $setcode, $DBLog, $CardLog;
-	$stmt = $DelverDBLink->prepare("SELECT * FROM usercards WHERE ownerid = ? AND cardid = ? AND setcode = ?");
+	$stmt = $DelverDBLink->prepare("SELECT count FROM usercards WHERE ownerid = ? AND cardid = ? AND setcode = ?") or die ( $DelverDBLink->error );
 	$stmt->bind_param("iis", $userid, $cardid, $setcode);
 	$stmt->execute();
 	$result = $stmt->get_result();
@@ -276,7 +278,7 @@ function AlterCardData($_cardid)
 {
 	global $DelverDBLink, $userid, $setcode, $existingCardCount, $count;
 	
-	$stmt = $DelverDBLink->prepare("UPDATE usercards SET count = ? WHERE ownerid = ? AND cardid = ? AND setcode = ?");
+	$stmt = $DelverDBLink->prepare("UPDATE usercards SET count = ? WHERE ownerid = ? AND cardid = ? AND setcode = ?") or die ( $DelverDBLink->error );
 	$newCount = $existingCardCount + $count;
 	$stmt->bind_param("iiis", $newCount, $userid, $_cardid, $setcode);
 	
@@ -287,7 +289,7 @@ function InsertNewCardData($_cardid)
 {
 	global $DelverDBLink, $userid, $setcode, $count;
 	
-	$stmt = $DelverDBLink->prepare("INSERT INTO usercards (ownerid, cardid, setcode, count) VALUES (?, ?, ?, ?)");
+	$stmt = $DelverDBLink->prepare("INSERT INTO usercards (ownerid, cardid, setcode, count) VALUES (?, ?, ?, ?)") or die ( $DelverDBLink->error );
 	$stmt->bind_param("iisi", $userid, $_cardid, $setcode, $count);
 	
 	return $stmt->execute();
@@ -297,7 +299,7 @@ function DeleteCardData( $_cardid )
 {
 	global $DelverDBLink, $userid, $setcode, $count;
 	
-	$stmt = $DelverDBLink->prepare("DELETE FROM usercards WHERE ownerid = ? AND cardid = ? AND setcode = ?");
+	$stmt = $DelverDBLink->prepare("DELETE FROM usercards WHERE ownerid = ? AND cardid = ? AND setcode = ?") or die ( $DelverDBLink->error );
 	$stmt->bind_param("iis", $userid, $_cardid, $setcode);
 	
 	return $stmt->execute();
@@ -307,7 +309,7 @@ function FindCardLinkID()
 {
 	global $DelverDBLink, $userid, $cardid;
 	
-	$stmt = $DelverDBLink->prepare("SELECT * FROM oracle WHERE cardid = ? AND linkid IS NOT NULL");
+	$stmt = $DelverDBLink->prepare("SELECT cardid_from FROM cardlinks WHERE cardid_to = ?") or die ( $DelverDBLink->error );
 	$stmt->bind_param("i", $cardid);
 	
 	$stmt->execute();
@@ -316,14 +318,14 @@ function FindCardLinkID()
 	if(!$row)
 		return null;
 	
-	return $row['linkid'];
+	return $row['cardid_from'];
 }
 
 function FindCardLinkName()
 {
 	global $DelverDBLink, $userid, $cardLinkID;
 
-	$stmt = $DelverDBLink->prepare("SELECT * FROM oracle WHERE cardid = ?");
+	$stmt = $DelverDBLink->prepare("SELECT name FROM cards WHERE id = ?") or die ( $DelverDBLink->error );
 	$stmt->bind_param("i", $cardLinkID);
 
 	$stmt->execute();
@@ -344,14 +346,12 @@ function ReturnXML($errno, $msg, $cardid=null, $setcode=null, $newcount=0)
 	$response->addAttribute('setcode', $setcode);
 	$response->addAttribute('newcount', $newcount);
 	echo $response->asXML();
-	//exit;
 }
 
 function AddCardChangeLog( $_userID, $_cardID, $_setcode, $_changeAmount )
 {
 	global $DelverDBLink;
-	//"INSERT INTO usercards (ownerid, cardid, setcode, count) VALUES (?, ?, ?, ?)"
-	$stmt = $DelverDBLink->prepare( "INSERT INTO usercardlog (userid, cardid, setcode, datemodified, difference) VALUES (?, ?, ?, ?, ?)" );
+	$stmt = $DelverDBLink->prepare( "INSERT INTO usercardchanges (userid, cardid, setcode, datemodified, difference) VALUES (?, ?, ?, ?, ?)" );
 	
 	if ( $stmt == null )
 	{
@@ -365,5 +365,3 @@ function AddCardChangeLog( $_userID, $_cardID, $_setcode, $_changeAmount )
 	$stmt->bind_param( "iissi", $_userID, $_cardID, $_setcode, $date, $_changeAmount );
 	return $stmt->execute();
 }
-
-?>

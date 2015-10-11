@@ -7,10 +7,6 @@ include_once "output.php";
 include_once "defines.php";
 include_once "users.php";
 
-require_once "C:\pear\pear\propel\Propel.php";
-Propel::init("\propel\build\conf\magic_db-conf.php");
-set_include_path("propel/build/classes/" . PATH_SEPARATOR . get_include_path());
-
 if ( __DEBUG__ )
 {
 	$SearchLog->log( "Starting new AJAX card search" );
@@ -28,19 +24,21 @@ if($DelverDBLink->connect_errno)
 // Find and store user card data
 if ( $IsLoggedIn )
 {
-	$UserCardQuery = new UserCardQuery();
-	$UserCardResults = $UserCardQuery
-		->filterByOwnerid( $_SESSION['userid'] )
-		->find();
+	$userCardStmt = $DelverDBLink->prepare( "SELECT cardid, setcode, count FROM usercards WHERE ownerid = ?" ) or die( $DelverDBLink->error );
+	
+	$userCardStmt->bind_param( 'i', $_SESSION['userid'] ) or die( $DelverDBLink->error );
+	$userCardStmt->execute() or die( $DelverDBLink->error );
+	
+	$userCardResults = $userCardStmt->get_result();
 	
 	$MyCardsArray = array();
 	
-	foreach ( $UserCardResults as $UserCard )
+	while ( $row = $userCardResults->fetch_assoc() )
 	{
-		$cardid = $UserCard->GetCardid();
-		$setcode = $UserCard->GetSetcode();
-		$count = $UserCard->GetCount();
-		if ( !array_key_exists($cardid, $MyCardsArray) )
+		$cardid = $row['cardid'];
+		$setcode = $row['setcode'];
+		$count = $row['count'];
+		if ( !array_key_exists( $cardid, $MyCardsArray ) )
 		{
 			$MyCardsArray[$cardid] = array();
 		}
@@ -50,8 +48,8 @@ if ( $IsLoggedIn )
 
 $MyCardsOnly = array_key_exists('MyCards', $_GET) && ($_GET['MyCards'] == 1);
 
-$QueryString = "SELECT oracle.name, oracle.cardid, cardsets.setcode, cardsets.rarity
-		 FROM oracle INNER JOIN cardsets ON oracle.cardid = cardsets.cardid WHERE ";
+$QueryString = "SELECT cards.name, cards.id, cardsets.setcode, cardsets.rarity, cardsets.multiverseid
+		 FROM cards INNER JOIN cardsets ON cards.id = cardsets.cardid WHERE ";
 
 $QueryStack = array();
 $QueryFormat = array();
@@ -99,21 +97,21 @@ $UniqueCardLimit = 500;
 
 while ( $cardArray = $SearchResults->fetch_assoc() )
 {
-	$cardid = $cardArray['cardid'];
+	$cardid = $cardArray['id'];
 	
 	// If searching for the users cards, remove cards that the user doesn't own
 	if ( $IsLoggedIn && $MyCardsOnly && !array_key_exists($cardid, $MyCardsArray) )
 	{
-		//print "Ignoring\n";
 		continue;
 	}
 	
 	$cardname = $cardArray['name'];
 	$setcode = $cardArray['setcode'];
 	$rarity = $cardArray['rarity'];
+	$multiverseid = $cardArray['multiverseid'];
 	
 	// Add the card if it isn't already added
-	if ( !array_key_exists($cardid, $CardsFound) )
+	if ( !array_key_exists( $cardid, $CardsFound ) )
 	{
 		$card = array();
 		$card['sets'] = array();
@@ -123,7 +121,7 @@ while ( $cardArray = $SearchResults->fetch_assoc() )
 	}
 	
 	// Add the new set to the card
-	$CardsFound[$cardid]['sets'][$setcode] = $rarity;
+	$CardsFound[$cardid]['sets'][$setcode] = array( 'rarity' => $rarity, 'multiverseid' => $multiverseid );
 	
 	if ( $UniqueCardsFound >= $UniqueCardLimit )
 	{
@@ -162,23 +160,13 @@ foreach($SortedCards as $cardname => $cardid)
 	$cardXML->addAttribute( 'id', $cardid);
 	$cardXML->addAttribute( 'totalcount', $totalCount );
 	
-	$sets = $CardsFound[$cardid]['sets'];
-	
-	// Sort the sets for each card
-	$setIndices = array();
-	foreach($sets as $setcode => $rarity)
+	$sets = $card['sets'];
+
+	foreach ( $sets as $setcode => $set )
 	{
-		$setIndices[] = Defines::$SetcodeToIndices[$setcode];
-	}
-	sort($setIndices);
-	array_reverse($setIndices);
-	
-	for ( $i = count($setIndices) - 1; $i >= 0; --$i )
-	{
+		$rarity = $set['rarity'];;
+		$multiverseid = $set['multiverseid'];
 		$count = 0;
-		$setIndex = $setIndices[$i];
-		$setcode = Defines::$SetcodeOrder[$setIndex];
-		$rarity = $card['sets'][$setcode];
 		
 		if($IsLoggedIn && array_key_exists($cardid, $MyCardsArray)
 		 && array_key_exists($setcode, $MyCardsArray[$cardid]))
@@ -190,7 +178,23 @@ foreach($SortedCards as $cardname => $cardid)
 		$setXML->addAttribute('setcode', $setcode);
 		$setXML->addAttribute('rarity', $rarity);
 		$setXML->addAttribute('count', $count);
+		$setXML->addAttribute('multiverseid', $multiverseid);
 	}
+}
+
+function setSortAsc( $a, $b )
+{
+	if ( $a == $b )
+	{
+		return 0;	
+	}
+	
+	$sets = ddb\Defines::GetSetList();
+	
+	$dateA = $sets[$a]->release_date;
+	$dateB = $sets[$b]->release_date;
+
+	return $dateA < $dateB ? -1 : 1; 
 }
 
 echo $responseXML->asXML();
@@ -198,7 +202,6 @@ echo $responseXML->asXML();
 $SearchLog->log("Search complete");
 
 exit;
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS
@@ -224,13 +227,12 @@ function AppendTextQuery()
 	}
 	
 	$text = $_GET['text'];
-	//$text = '%'.$text.'%';
 
 	$first = true;
 	
 	if ( array_key_exists( 'Name', $_GET ) && $_GET['Name'] == 1)
 	{
-		$QueryString .= " (oracle.name REGEXP ?)";
+		$QueryString .= " (cards.name REGEXP ?)";
 		$first = false;
 		array_push( $QueryStack, $text );
 		array_push( $QueryFormat,'s' );
@@ -242,7 +244,7 @@ function AppendTextQuery()
 		{
 			$QueryString .= " OR ";
 		}
-		$QueryString .= " (oracle.subtype REGEXP ? OR oracle.type REGEXP ?)";
+		$QueryString .= " (cards.subtype REGEXP ? OR cards.type REGEXP ?)";
 		array_push( $QueryStack, $text, $text );
 		array_push( $QueryFormat,'s', 's' );
 		$first = false;
@@ -254,7 +256,7 @@ function AppendTextQuery()
 		{
 			$QueryString .= " OR ";
 		}
-		$QueryString .= " (oracle.rules REGEXP ?) ";
+		$QueryString .= " (cards.rules REGEXP ?) ";
 		array_push( $QueryStack, $text );
 		array_push( $QueryFormat,'s' );
 	}
@@ -291,7 +293,7 @@ function AppendTypeQuery()
 			{
 				$TypeQuery .= " OR ";
 			}
-			$TypeQuery .= " oracle.type LIKE '%$type%' ";
+			$TypeQuery .= " cards.type LIKE '%$type%' ";
 		}
 		else
 		{
@@ -321,12 +323,12 @@ function AppendColourQuery()
 	$AnyColourSelected = false;
 	$first = true;
 	
-	foreach(Defines::$ColourSymbolsToNames as $symbol => $colour)
+	foreach ( ddb\Defines::$colourList as $symbol => $colour )
 	{
-		if(array_key_exists($colour, $_GET) && $_GET[$colour] != '0')
+		if ( array_key_exists( $colour->name, $_GET ) && $_GET[$colour->name] != '0')
 		{
 			$AnyColourSelected = true;
-			if($first)
+			if ( $first )
 			{
 				$first = false;
 			}
@@ -334,8 +336,8 @@ function AppendColourQuery()
 			{
 				$ColourQuery .= " OR ";
 			}
-			$ColourFlag = Defines::$ColourSymbolsToInt[$symbol];
-			$ColourQuery .= " oracle.colour & '$ColourFlag' ";
+			$ColourFlag = $colour->flag;
+			$ColourQuery .= " cards.colour & '$ColourFlag' ";
 		}
 		else
 		{
@@ -353,7 +355,7 @@ function AppendColourQuery()
 	if(array_key_exists('Colourless', $_GET))
 	{
 		$AnyColourSelected = true;
-		$ColourQuery .= " OR oracle.colour = '0'";
+		$ColourQuery .= " OR cards.colour = '0'";
 	}
 	else
 	{
@@ -382,9 +384,9 @@ function AppendRarityQuery()
 	$AllRaritysSelected = true;
 	$AnyRaritySelected = false;
 	$first = true;
-	foreach ( Defines::$RarityNameToSymbol as $rarity => $symbol )
+	foreach ( ddb\Defines::$rarityList as $symbol => $name )
 	{
-		if ( $rarity != "Land" && array_key_exists( $rarity, $_GET ) && $_GET[$rarity] == '1' )
+		if ( $name != "Land" && array_key_exists( $name, $_GET ) && $_GET[$name] == '1' )
 		{
 			$AnyRaritySelected = true;
 			if ( $first )
@@ -431,11 +433,14 @@ function AppendSetQuery()
 	}
 	$first = true;
 	$SetQuery = " ( ";
+	
+	$sets = ddb\Defines::getSetList();
+	
 	foreach ( $_GET['set'] as $index => $setcode )
 	{
-		if ( array_key_exists( $setcode, Defines::$SetCodeToNameMap ) )
+		if ( array_key_exists( $setcode, $sets ) )
 		{
-			if(!$first)
+			if ( !$first )
 			{
 				$SetQuery .= " OR ";
 			}

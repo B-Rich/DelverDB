@@ -29,7 +29,7 @@ function LoginInformationSent()
 
 function AttemptLogin()
 {
-	global $LoginErrorMessage, $UserLog, $DBLog;
+	global $LoginErrorMessage, $UserLog, $DBLog, $SQLUsers;
 	
 	if(!LoginInformationSent())
 		return false;
@@ -44,19 +44,27 @@ function AttemptLogin()
 	
 	$password = crypt($password, '$1$0M5.Hg..$XPxNWyFzXv8BT.sEJ.CFf0');
 	
-	require_once "C:\pear\pear\propel\Propel.php";
-	Propel::init("\propel\build\conf\magic_db-conf.php");
-	set_include_path("propel/build/classes/" . PATH_SEPARATOR . get_include_path());
+	$SQLUser = $SQLUsers['user_handler'];
+	$DelverDBLink = new mysqli( "localhost", $SQLUser->username, $SQLUser->password, "delverdb" );
+	if ( $DelverDBLink->connect_errno )
+	{
+		$errno = $DelverDBLink->connect_errno;
+		$error = $DelverDBLink->connect_error;
+		$DBLog->err( "Connection error (".$errno.") ".$error );
+		die( "Connection error ($errno)" );
+	}
 	
-	$UserQuery = new UserQuery();
-	$UserResult = $UserQuery->filterByUsername($username)
-		->filterByPassword($password)
-		->findOne();
+	$userStmt = $DelverDBLink->prepare(
+			"SELECT * FROM users WHERE username = ? AND password = ?") or die( $DelverDBLink->error );
+	print_r( $password );
+	$userStmt->bind_param( "ss", $username, $password ) or die( $DelverDBLink->error );
+	$userStmt->execute() or die( $DelverDBLink->error );
+	$userResult = $userStmt->get_result();
 	
-	if($UserResult)
+	if ( $row = $userResult->fetch_assoc() )
 	{
 		$_SESSION['login'] = true;
-		$_SESSION['userid'] = $UserResult->GetId();
+		$_SESSION['userid'] = $row['id'];
 		$_SESSION['username'] = $username;
 		$_SESSION['password'] = $password;
 		$UserLog->log("Successful login for $username");

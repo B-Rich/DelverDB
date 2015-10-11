@@ -21,12 +21,21 @@ function splitstring(str)
     return pieces;
 }
 
+
+
 function GetSetIconURL(_setcode, _rarity)
 {
 	"use strict";
 	return "images/exp/" + _setcode + "_" + _rarity + "_small.jpg";
 }
 
+function GetCardImageURL( _multiverseid )
+{
+	"use strict";
+	return "images/cards/" + _multiverseid + ".png";
+}
+
+/*
 function GetCardImageFilename( _cardname, _setcode )
 {
 	"use strict";
@@ -34,6 +43,7 @@ function GetCardImageFilename( _cardname, _setcode )
 	var str = "images/cardpic/_"+_setcode+'/'+_cardname.replace(':', '').replace('"', '')+".jpg";
 	return str;
 }
+*/
 
 function escapeHtml(text) {
   var map = {

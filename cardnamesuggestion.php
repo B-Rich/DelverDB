@@ -19,7 +19,7 @@ if(!array_key_exists('cardname', $_GET))
 $CardName = $_GET['cardname'];
 $CardName = $CardName."%";
 
-$SearchStmt = $DelverDBLink->prepare("SELECT oracle.name FROM oracle WHERE oracle.name LIKE ? ORDER BY oracle.name ASC");
+$SearchStmt = $DelverDBLink->prepare("SELECT name FROM cards WHERE name LIKE ? ORDER BY name ASC");
 $SearchStmt->bind_param("s", $CardName);
 $SearchStmt->execute();
 $SearchResult = $SearchStmt->get_result();

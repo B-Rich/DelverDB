@@ -17,15 +17,15 @@ $mode = "oracle";
 
 if ( $mode == "oracle" )
 {
-	$OracleStmt = $DelverDBLink->prepare( "SELECT * FROM oracle" );
+	$OracleStmt = $DelverDBLink->prepare( "SELECT * FROM cards" ) or die ( $DelverDBLink->error );
 	$OracleStmt->execute();
 	$OracleResults = $OracleStmt->get_result();
 	
-	$SetsStmt = $DelverDBLink->prepare( "SELECT * FROM cardsets" );
+	$SetsStmt = $DelverDBLink->prepare( "SELECT * FROM cardsets" ) or die ( $DelverDBLink->error );
 	$SetsStmt->execute();
 	$SetResults = $SetsStmt->get_result();
 	
-	$UserCardStmt = $DelverDBLink->prepare( "SELECT * FROM usercards WHERE ownerid = 1" );
+	$UserCardStmt = $DelverDBLink->prepare( "SELECT * FROM usercards WHERE ownerid = 1" ) or die ( $DelverDBLink->error );
 	$UserCardStmt->execute();
 	$UserCardResults = $UserCardStmt->get_result();
 	
@@ -89,7 +89,7 @@ if ( $mode == "oracle" )
 		
 		$cardXML = $responseXML->addChild('card');
 		
-		$cardID = $row['cardid'];
+		$cardID = $row['id'];
 		foreach ( $row as $key => $value )
 		{
 			if ( $key == "numpower" && (string)$value == (string)$row['power'] 
@@ -186,18 +186,17 @@ else if ( $mode == "setlist" )
 {
 	$setListXml = new SimpleXMLElement( "<setlist></setlist>" );
 	
-	foreach ( Defines::$CardBlocksToSetCodes as $blockname => $setarray )
+	$blocks = ddb\Defines::getBlockList();
+	foreach ( $blocks as $blockid => $block )
 	{
 		$blockElement = $setListXml->addChild( "format" );
-		$blockElement->addChild( "name", $blockname );
+		$blockElement->addChild( "name", $block->name );
 		
-		foreach ( $setarray as $index => $setcode )
+		foreach ( $blocks->sets as $setcode => $set )
 		{
-			$setname = Defines::$SetCodeToNameMap[$setcode];	
-			
 			$setElement = $blockElement->addChild( "set" );
-			$setElement->addChild( "code", $setcode );
-			$setElement->addChild( "name", $setname );
+			$setElement->addChild( "code", $set->code );
+			$setElement->addChild( "name", $set->name );
 		}
 			
 	}
@@ -205,5 +204,3 @@ else if ( $mode == "setlist" )
 }
 
 exit;
-
-?>

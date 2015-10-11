@@ -14,7 +14,7 @@
 				{% for block in blocks%}
 					<optgroup label="{{ block.name }}">
 					{% for set in block.sets|reverse %}
-						<option value="{{ set.setcode }}">{{ set.name }}</option>
+						<option value="{{ set.code }}">{{ set.name }}</option>
 					{% endfor %}
 					</optgroup>
 				{% endfor %}

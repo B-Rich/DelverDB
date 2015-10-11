@@ -91,10 +91,6 @@ class Card
 		$this->total += $_count;
 		$set = new Set();
 		$set->code = $_setcode;
-		if ( array_key_exists( $_setcode, Defines::$SetCodeToNameMap ) )
-		{
-			$set->name = Defines::$SetCodeToNameMap[$_setcode];
-		}
 		
 		$set->rarity = $_rarity;
 		$set->cnum = $cnum;
@@ -110,7 +106,6 @@ class Card
 class Set
 {
 	public $code;
-	public $name;
 	public $multiverseid;
 	public $rarity;
 	public $cnum;
