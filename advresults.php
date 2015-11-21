@@ -381,12 +381,12 @@ function BooleanSymbolToSQL( $_symbol )
 
 function nameCardMatch($name, $comp)
 {
-	return decodeStringMatch( $name, "oracle.name" );
+	return decodeStringMatch( $name, "cards.name" );
 }
 
 function rulesCardMatch( $rules, $comp )
 {
-	return decodeStringMatch( $rules, "oracle.rules" );
+	return decodeStringMatch( $rules, "cards.rules" );
 }
 
 function expansionCardMatch($expansion, $comp)
@@ -1027,26 +1027,26 @@ function RemoveUserCountMatches()
 			
 			switch ( $param->bool )
 			{
-				case "&":
+				case 'and':
 					if ( $thisIsGood == false )
 					{
 						$goodID = false;
 					}
 					break;
-				case "|":
+				case 'or':
 					if ( $thisIsGood )
 					{
 						$goodID = true;	
 					}
 					break;
-				case "!":
+				case 'not':
 					if ( $thisIsGood )
 					{
 						$goodID = false;	
 					}
 					break;
 				default:
-					die( "Unknown bool type ".$param->bool );
+					die( "Unknown bool type $param->bool" );
 					break;	
 			}
 		}

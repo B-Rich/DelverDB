@@ -46,10 +46,10 @@ if($DelverDBLink->connect_errno)
 
 $UserID = $_SESSION['userid'];
 
-$LinkedCardStmt = $DelverDBLink->prepare("SELECT oracle.name, oracle.cardid, oracle.linkid, usercards.count
-						FROM oracle, usercards
-						WHERE oracle.cardid = usercards.cardid
-						AND oracle.linkid IS NOT NULL
+$LinkedCardStmt = $DelverDBLink->prepare("SELECT cards.name, cards.id, cards.linkid, usercards.count
+						FROM cards JOIN usercards
+                        ON cards.id = usercards.cardid
+						WHERE cards.linkid IS NOT NULL
 						AND usercards.ownerid = ?");
 if(!$LinkedCardStmt)
 	die($DelverDBLink->error);
