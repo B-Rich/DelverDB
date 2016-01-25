@@ -78,8 +78,17 @@ abstract class Defines
 		
 		Defines::openConnection();
 		
-		$stmt = Defines::$DelverDBLink->prepare( "SELECT b.id blockid, b.name, s.code setcode FROM blocks b JOIN sets s ON s.blockid = b.id ORDER BY b.id ASC, s.id ASC" )
-			or die( Defines::$DelverDBLink->error );
+		$stmt = Defines::$DelverDBLink->prepare( "
+SELECT 
+b.id
+blockid, 
+COALESCE( b.name, 'Miscellaneous' ) name,
+s.code setcode
+FROM sets s
+LEFT JOIN blocks b
+ON s.blockid = b.id
+ORDER BY -b.id DESC, s.id ASC
+		" ) or die( Defines::$DelverDBLink->error );
 		$stmt->execute();
 		$result = $stmt->get_result();
 		
