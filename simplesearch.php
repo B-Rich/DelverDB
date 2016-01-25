@@ -19,22 +19,22 @@ $args["heading"] = "Simple Search";
 $args['isloggedin'] = $IsLoggedIn;
 
 if($LoginErrorMessage != null)
-	$args['loginerrormessage'] = $LoginErrorMessage;
+    $args['loginerrormessage'] = $LoginErrorMessage;
 $args['loginurl'] = $_SERVER['PHP_SELF'];
 if($IsLoggedIn)
 {
-	$args['username'] = $_SESSION['username'];
+    $args['username'] = $_SESSION['username'];
 }
 
 $args['scripts'] = array
 (
-	'<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>',
-	'<script type="text/javascript" src="common.js" ></script>',
-	'<script type="text/javascript">
-		var IsLoggedIn = '.($IsLoggedIn ? "true" : "false").';
-		var PageMode = "Search"; 
-	</script>',
-	'<script type="text/javascript" src="simplesearch.js" ></script>'
+    '<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>',
+    '<script type="text/javascript" src="common.js" ></script>',
+    '<script type="text/javascript">
+        var IsLoggedIn = '.($IsLoggedIn ? "true" : "false").';
+        var PageMode = "Search"; 
+    </script>',
+    '<script type="text/javascript" src="simplesearch.js" ></script>'
 );
 
 echo $template->render($args);

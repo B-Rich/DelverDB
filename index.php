@@ -18,11 +18,11 @@ $args["heading"] = "Home";
 $args['isloggedin'] = $IsLoggedIn;
 
 if($LoginErrorMessage != null)
-	$args['loginerrormessage'] = $LoginErrorMessage;
+    $args['loginerrormessage'] = $LoginErrorMessage;
 $args['loginurl'] = $_SERVER['PHP_SELF'];
 if($IsLoggedIn)
 {
-	$args['username'] = $_SESSION['username'];
+    $args['username'] = $_SESSION['username'];
 }
 echo $template->render($args);
 
@@ -45,20 +45,20 @@ set_include_path("propel/build/classes/" . PATH_SEPARATOR . get_include_path());
 
 if(array_key_exists('tasktext', $_GET))
 {
-	$task = new Task();
-	$task->setDescription($_GET['tasktext']);
-	$task->save();
+    $task = new Task();
+    $task->setDescription($_GET['tasktext']);
+    $task->save();
 }
 else if(array_key_exists('toggle', $_GET))
 {
-	$FetchQuery = new TaskQuery();
-	$Result = $FetchQuery->findPK($_GET['toggle']);
-	
-	if($Result)
-	{
-		$Result->setCompleted(!$Result->GetCompleted());
-		$Result->save();
-	}	
+    $FetchQuery = new TaskQuery();
+    $Result = $FetchQuery->findPK($_GET['toggle']);
+    
+    if($Result)
+    {
+        $Result->setCompleted(!$Result->GetCompleted());
+        $Result->save();
+    }    
 }
 
 $count = 0;
@@ -69,15 +69,15 @@ $tasks = $TaskQuery->find();
 echo "<table>";
 foreach($tasks as $task)
 {
-	$count ++;
-	echo "<tr>";
-	echo "<td>$count</td>";
-	echo "<td>".$task->GetDescription()."</td>";
-	echo "<td>";
-	echo "<a href=\"index.php?toggle={$task->GetId()}\">";
-	echo "<img src=\"images/".($task->GetCompleted() == 0 ? "cross-24.png" : "tick-24.png")."\" alt=\"".($task->GetCompleted() ? "Not Done" : "Done")."\"/>";
-	echo "</a></td>";
-	echo "</tr>";
+    $count ++;
+    echo "<tr>";
+    echo "<td>$count</td>";
+    echo "<td>".$task->GetDescription()."</td>";
+    echo "<td>";
+    echo "<a href=\"index.php?toggle={$task->GetId()}\">";
+    echo "<img src=\"images/".($task->GetCompleted() == 0 ? "cross-24.png" : "tick-24.png")."\" alt=\"".($task->GetCompleted() ? "Not Done" : "Done")."\"/>";
+    echo "</a></td>";
+    echo "</tr>";
 }
 echo "</table>";
 

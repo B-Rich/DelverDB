@@ -5,7 +5,7 @@ global $IsLoggedIn, $LoginErrorMessage;
 
 if ( $IsLoggedIn == false )
 {
-	header( "Location: index.php" );
+    header( "Location: index.php" );
 }
 
 require_once 'C:/pear/pear/twig/autoloader.php';
@@ -27,11 +27,11 @@ $args["heading"] = "My Decks";
 $args['isloggedin'] = $IsLoggedIn;
 
 if($LoginErrorMessage != null)
-	$args['loginerrormessage'] = $LoginErrorMessage;
+    $args['loginerrormessage'] = $LoginErrorMessage;
 $args['loginurl'] = $_SERVER['PHP_SELF'];
 if($IsLoggedIn)
 {
-	$args['username'] = $_SESSION['username'];
+    $args['username'] = $_SESSION['username'];
 }
 echo $template->render($args);
 
@@ -42,11 +42,11 @@ echo "<a href='deckmaker.php'>Make a Deck</a>";
 
 class deck
 {
-	public $index;
-	public $id;
-	public $name;
-	public $datecreated;
-	public $datemodified;
+    public $index;
+    public $id;
+    public $name;
+    public $datecreated;
+    public $datemodified;
 };
 
 $UserID = $_SESSION['userid'];
@@ -58,26 +58,26 @@ $Decks = array();
 $DeckCount = 0;
 foreach($DeckResults as $Deck)
 {
-	$deck = new Deck();
-	$deck->index = ++$DeckCount;
-	$deck->name = $Deck->GetDeckName();
-	$deck->id = $Deck->GetDeckID();
-	$deck->datecreated = $Deck->GetDateCreated();;
-	$deck->datemodified = $Deck->GetDateModified();
-	$Decks[] = $deck;
+    $deck = new Deck();
+    $deck->index = ++$DeckCount;
+    $deck->name = $Deck->GetDeckName();
+    $deck->id = $Deck->GetDeckID();
+    $deck->datecreated = $Deck->GetDateCreated();;
+    $deck->datemodified = $Deck->GetDateModified();
+    $Decks[] = $deck;
 }
 
 if($DeckCount > 0)
 {
-	$args['decks'] = $Decks;
-	
-	$template = $twig->loadTemplate('mydecks.twig');
-	
-	echo $template->render($args);
+    $args['decks'] = $Decks;
+    
+    $template = $twig->loadTemplate('mydecks.twig');
+    
+    echo $template->render($args);
 }
 else
 {
-	echo "<h3>You don't have any decks</h3>";
+    echo "<h3>You don't have any decks</h3>";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

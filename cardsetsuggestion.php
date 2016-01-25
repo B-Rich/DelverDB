@@ -13,15 +13,15 @@ $DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, 
 
 if(!array_key_exists('cardname', $_GET))
 {
-	ReturnXMLError(1, "No card name sent");
+    ReturnXMLError(1, "No card name sent");
 }
 
 $CardName = $_GET['cardname'];
 
 $SearchStmt = $DelverDBLink->prepare("
-		SELECT DISTINCT cardsets.setcode FROM cards, cardsets
-		WHERE cards.name = ?
-		AND cards.id = cardsets.cardid");
+        SELECT DISTINCT cardsets.setcode FROM cards, cardsets
+        WHERE cards.name = ?
+        AND cards.id = cardsets.cardid");
 
 $SearchStmt->bind_param("s", $CardName);
 $SearchStmt->execute();
@@ -34,10 +34,10 @@ $sets = ddb\Defines::getSetList();
 
 while($row = $SearchResult->fetch_assoc())
 {
-	$card = $response->addChild("set");
-	$setcode = $row['setcode'];
-	$card->addAttribute('code', $setcode);
-	$card->addAttribute('name', $sets[$setcode]->name);
+    $card = $response->addChild("set");
+    $setcode = $row['setcode'];
+    $card->addAttribute('code', $setcode);
+    $card->addAttribute('name', $sets[$setcode]->name);
 }
 
 echo $response->asXML();
@@ -47,11 +47,11 @@ exit;
 
 function ReturnXMLError($errno, $msg)
 {
-	$xmlstr = "<response>$msg</response>";
-	$response = new SimpleXMLElement($xmlstr);
-	$response->addAttribute('errno', $errno);
-	echo $response->asXML();
-	exit;
+    $xmlstr = "<response>$msg</response>";
+    $response = new SimpleXMLElement($xmlstr);
+    $response->addAttribute('errno', $errno);
+    echo $response->asXML();
+    exit;
 }
 
 ?>

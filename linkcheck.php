@@ -7,7 +7,7 @@ global $IsLoggedIn, $LoginErrorMessage;
 
 if(!$IsLoggedIn)
 {
-	header("Location: index.php");
+    header("Location: index.php");
 }
 
 require_once 'C:/pear/pear/twig/autoloader.php';
@@ -25,11 +25,11 @@ $args["heading"] = "Linked Card Check";
 $args['isloggedin'] = $IsLoggedIn;
 
 if($LoginErrorMessage != null)
-	$args['loginerrormessage'] = $LoginErrorMessage;
+    $args['loginerrormessage'] = $LoginErrorMessage;
 $args['loginurl'] = $_SERVER['PHP_SELF'];
 if($IsLoggedIn)
 {
-	$args['username'] = $_SESSION['username'];
+    $args['username'] = $_SESSION['username'];
 }
 echo $template->render($args);
 
@@ -40,58 +40,58 @@ $SQLUser = $SQLUsers['ddb_usercards'];
 $DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "delverdb");
 if($DelverDBLink->connect_errno)
 {
-	$DBLog->err("Connection error (".$DelverDBLink->connect_errno.") ".$DelverDBLink->connect_error);
-	die("Connection error");
+    $DBLog->err("Connection error (".$DelverDBLink->connect_errno.") ".$DelverDBLink->connect_error);
+    die("Connection error");
 }
 
 $UserID = $_SESSION['userid'];
 
 $LinkedCardStmt = $DelverDBLink->prepare("SELECT cards.name, cards.id, cards.linkid, usercards.count
-						FROM cards JOIN usercards
+                        FROM cards JOIN usercards
                         ON cards.id = usercards.cardid
-						WHERE cards.linkid IS NOT NULL
-						AND usercards.ownerid = ?");
+                        WHERE cards.linkid IS NOT NULL
+                        AND usercards.ownerid = ?");
 if(!$LinkedCardStmt)
-	die($DelverDBLink->error);
+    die($DelverDBLink->error);
 
 $LinkedCardStmt->bind_param("i", $UserID);
 $LinkedCardStmt->execute();
 $LinkCardResult = $LinkedCardStmt->get_result();
 
 $CountStmt = $DelverDBLink->prepare("SELECT count FROM usercards
-								WHERE cardid = ? AND ownerid = ?");
+                                WHERE cardid = ? AND ownerid = ?");
 
 if( !$CountStmt )
 {
-	die($DelverDBLink->error);
+    die($DelverDBLink->error);
 }
-	
+    
 while ( $row = $LinkCardResult->fetch_assoc() )
 {
-	$cardid = $row['cardid'];
-	$linkid = $row['linkid'];
-	$name = $row['name'];
-	$count = $row['count'];
-	
-	$CountStmt->bind_param( "ii", $linkid, $UserID );
-	$CountStmt->execute();
-	
-	$linkResult = $CountStmt->get_result();
-	
-	$linkRow = $linkResult->fetch_assoc();
-	
-	if ( !$linkRow )
-	{
-		echo "You own $count x $name, but not the other half</br>";
-		continue;
-	}
-	
-	$linkCount = $linkRow['count'];
-	
-	if ( $linkCount != $count )
-	{
-		echo "You own $count x $name ($cardid), but you own $linkCount of the other half ($linkid)</br>";
-	}
+    $cardid = $row['cardid'];
+    $linkid = $row['linkid'];
+    $name = $row['name'];
+    $count = $row['count'];
+    
+    $CountStmt->bind_param( "ii", $linkid, $UserID );
+    $CountStmt->execute();
+    
+    $linkResult = $CountStmt->get_result();
+    
+    $linkRow = $linkResult->fetch_assoc();
+    
+    if ( !$linkRow )
+    {
+        echo "You own $count x $name, but not the other half</br>";
+        continue;
+    }
+    
+    $linkCount = $linkRow['count'];
+    
+    if ( $linkCount != $count )
+    {
+        echo "You own $count x $name ($cardid), but you own $linkCount of the other half ($linkid)</br>";
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

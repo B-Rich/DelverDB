@@ -5,7 +5,7 @@ global $IsLoggedIn, $LoginErrorMessage;
 
 if(!$IsLoggedIn)
 {
-	header("Location: index.php");
+    header("Location: index.php");
 }
 
 require_once 'C:/pear/pear/twig/autoloader.php';
@@ -23,11 +23,11 @@ $args["heading"] = "Add Cards";
 $args['isloggedin'] = $IsLoggedIn;
 
 if($LoginErrorMessage != null)
-	$args['loginerrormessage'] = $LoginErrorMessage;
+    $args['loginerrormessage'] = $LoginErrorMessage;
 $args['loginurl'] = $_SERVER['PHP_SELF'];
 if($IsLoggedIn)
 {
-	$args['username'] = $_SESSION['username'];
+    $args['username'] = $_SESSION['username'];
 }
 $args['scripts'][] = '<script type="text/javascript" src="common.js" ></script>';
 $args['scripts'][] = '<script type="text/javascript" src="addcards.js" ></script>';
@@ -41,28 +41,28 @@ echo $template->render($args);
 $args['blocks'] = array();
 class block
 {
-	public $name;
-	public $sets = array();
+    public $name;
+    public $sets = array();
 };
 
 class set
 {
-	public $name;
-	public $setcode;
+    public $name;
+    public $setcode;
 };
 
 $blocks = ddb\Defines::GetBlockList();
 
 foreach ( $blocks as $blockid => $block )
-{	
-	foreach ( $block->sets as $set )
-	{
-		$setArg = new set();
-		$setArg->setcode = $set->code;
-		$setArg->name = $set->name;
-		$block->sets[] = $setArg;
-	}
-	$args['blocks'][] = $block;
+{    
+    foreach ( $block->sets as $set )
+    {
+        $setArg = new set();
+        $setArg->setcode = $set->code;
+        $setArg->name = $set->name;
+        $block->sets[] = $setArg;
+    }
+    $args['blocks'][] = $block;
 }
 
 $template = $twig->loadTemplate('addcards.twig');

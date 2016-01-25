@@ -13,7 +13,7 @@ $DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, 
 
 if(!array_key_exists('cardname', $_GET))
 {
-	ReturnXMLError(1, "No card name sent");
+    ReturnXMLError(1, "No card name sent");
 }
 
 $CardName = $_GET['cardname'];
@@ -31,12 +31,12 @@ $resultCap = 5;
 
 while($row = $SearchResult->fetch_assoc())
 {
-	$card = $response->addChild("card");
-	$card->addAttribute('name', utf8_encode($row['name']));
-	
-	$rowcount ++;
-	if($rowcount >= $resultCap)
-		break;
+    $card = $response->addChild("card");
+    $card->addAttribute('name', utf8_encode($row['name']));
+    
+    $rowcount ++;
+    if($rowcount >= $resultCap)
+        break;
 }
 
 echo $response->asXML();
@@ -46,11 +46,11 @@ exit;
 
 function ReturnXMLError($errno, $msg)
 {
-	$xmlstr = "<response>$msg</response>";
-	$response = new SimpleXMLElement($xmlstr);
-	$response->addAttribute('errno', $errno);
-	echo $response->asXML();
-	exit;
+    $xmlstr = "<response>$msg</response>";
+    $response = new SimpleXMLElement($xmlstr);
+    $response->addAttribute('errno', $errno);
+    echo $response->asXML();
+    exit;
 }
 
 ?>

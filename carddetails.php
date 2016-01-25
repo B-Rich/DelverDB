@@ -18,10 +18,10 @@ $SQLUser = $SQLUsers['ddb_usercards'];
 $DelverDBLink = new mysqli( "localhost", $SQLUser->username, $SQLUser->password, "delverdb" );
 if ( $DelverDBLink->connect_errno )
 {
-	$errno = $DelverDBLink->connect_errno;
-	$error = $DelverDBLink->connect_error;
-	$DBLog->err( "Connection error (".$errno.") ".$error );
-	die( "Connection error ($errno)" );
+    $errno = $DelverDBLink->connect_errno;
+    $error = $DelverDBLink->connect_error;
+    $DBLog->err( "Connection error (".$errno.") ".$error );
+    die( "Connection error ($errno)" );
 }
 
 $stmt = $DelverDBLink->prepare( "SET NAMES 'utf8'" ) or die( $DelverDBLink->error );
@@ -33,13 +33,13 @@ $stmt->execute();
 $CardID = null; $Setcode = null;
 if ( array_key_exists( 'id', $_GET ) == false )
 {
-	die( "No card ID supplied." );
+    die( "No card ID supplied." );
 }
 $CardID = $_GET["id"];
 
 if ( array_key_exists( 'set', $_GET ) == true )
 {
-	$Setcode = $_GET['set'];
+    $Setcode = $_GET['set'];
 }
 
 $CardObj = new Card();
@@ -55,7 +55,7 @@ $OracleResult = $OracleDataStmt->get_result();
 $OracleRow = $OracleResult->fetch_assoc();
 if ( $OracleRow == null )
 {
-	die( "No card with ID $CardID exists." );
+    die( "No card with ID $CardID exists." );
 }
 
 $CardObj->ConstructFromResults( $OracleRow );
@@ -66,23 +66,23 @@ $CardObj->ConstructFromResults( $OracleRow );
 $OwnershipArray = null;
 if ( $IsLoggedIn == true )
 {
-	$OwnershipArray = array();
-	$OwnershipStmt = $DelverDBLink->prepare
-	(
-		"SELECT setcode, count FROM usercards WHERE ownerid = ? AND cardid = ?"
-	) or die();
-	
-	$OwnershipStmt->bind_param( "ii", $UserID, $CardID ) or die();
-	$OwnershipStmt->execute();
+    $OwnershipArray = array();
+    $OwnershipStmt = $DelverDBLink->prepare
+    (
+        "SELECT setcode, count FROM usercards WHERE ownerid = ? AND cardid = ?"
+    ) or die();
+    
+    $OwnershipStmt->bind_param( "ii", $UserID, $CardID ) or die();
+    $OwnershipStmt->execute();
 
-	$OwnershipResults = $OwnershipStmt->get_result();
-	
-	while ( $row = $OwnershipResults->fetcH_assoc() )
-	{
-		$set = $row['setcode'];
-		$count = $row['count'];
-		$OwnershipArray[$set] = $count;
-	}
+    $OwnershipResults = $OwnershipStmt->get_result();
+    
+    while ( $row = $OwnershipResults->fetcH_assoc() )
+    {
+        $set = $row['setcode'];
+        $count = $row['count'];
+        $OwnershipArray[$set] = $count;
+    }
 }
 
 
@@ -101,26 +101,26 @@ $index = 0;
 /// Fill out the sets for the card
 while ( $setRow = $CardSetResult->fetch_assoc() )
 {
-	$set = $setRow['setcode'];
-	$rarity = $setRow['rarity'];
-	$cnum = $setRow['collectornum'];
-	$artist = $setRow['artist'];
-	$multiverseid = $setRow['multiverseid'];
-	
-	if ( strcasecmp( $Setcode, $set ) == 0 )
-	{
-		$SelectedSetIndex = $index; 
-	}
+    $set = $setRow['setcode'];
+    $rarity = $setRow['rarity'];
+    $cnum = $setRow['collectornum'];
+    $artist = $setRow['artist'];
+    $multiverseid = $setRow['multiverseid'];
+    
+    if ( strcasecmp( $Setcode, $set ) == 0 )
+    {
+        $SelectedSetIndex = $index; 
+    }
 
-	$count = 0;
-	/// Use the count if the user is logged in, and owns the card
-	if ( $OwnershipArray != null
-	  && array_key_exists( $set, $OwnershipArray ) )
-	{
-		$count = $OwnershipArray[$set];
-	}
-	$CardObj->AddSet( $set, $rarity, $cnum, $artist, $count, $multiverseid );
-	++$index;
+    $count = 0;
+    /// Use the count if the user is logged in, and owns the card
+    if ( $OwnershipArray != null
+      && array_key_exists( $set, $OwnershipArray ) )
+    {
+        $count = $OwnershipArray[$set];
+    }
+    $CardObj->AddSet( $set, $rarity, $cnum, $artist, $count, $multiverseid );
+    ++$index;
 }
 $CardObj->imageurl = $CardObj->GetFirstImageURL();
 
@@ -139,48 +139,48 @@ $CardChanges = array();
 // If the user is logged in and owns the card
 if ( $IsLoggedIn && $OwnershipArray != null )
 {
-	$CardChangeStmt = $DelverDBLink->prepare(
-			"SELECT setcode, datemodified, difference FROM usercardchanges
-			WHERE userid = ? AND cardid = ? ORDER BY datemodified DESC") or die( $DelverDBLink->error );
-	
-	$CardChangeStmt->bind_param( "ii", $UserID, $CardID ) or die();
-	$CardChangeStmt->execute() or die();
-	$CardChangeResult = $CardChangeStmt->get_result();
-	
-	$sets = ddb\Defines::getSetList();
-	
-	$Total = 0;
-	while ( $row = $CardChangeResult->fetch_assoc() )
-	{
-		$change = new Change();
-		
-		$setcode = $row['setcode'];
-		$setname = $sets[$setcode]->name;
-		
-		$change->date = $row["datemodified"];
-		$change->difference = $row["difference"];
-		
-		if ( array_key_exists( $setcode, $CardChanges ) == false )
-		{
-			$CardChanges[ $setcode ] = new SetChange();
-			$CardChanges[ $setcode ]->setname = $setname;
-		}
-		
-		$CardChanges[ $setcode ]->changes[] = $change;
-	}
+    $CardChangeStmt = $DelverDBLink->prepare(
+            "SELECT setcode, datemodified, difference FROM usercardchanges
+            WHERE userid = ? AND cardid = ? ORDER BY datemodified DESC") or die( $DelverDBLink->error );
+    
+    $CardChangeStmt->bind_param( "ii", $UserID, $CardID ) or die();
+    $CardChangeStmt->execute() or die();
+    $CardChangeResult = $CardChangeStmt->get_result();
+    
+    $sets = ddb\Defines::getSetList();
+    
+    $Total = 0;
+    while ( $row = $CardChangeResult->fetch_assoc() )
+    {
+        $change = new Change();
+        
+        $setcode = $row['setcode'];
+        $setname = $sets[$setcode]->name;
+        
+        $change->date = $row["datemodified"];
+        $change->difference = $row["difference"];
+        
+        if ( array_key_exists( $setcode, $CardChanges ) == false )
+        {
+            $CardChanges[ $setcode ] = new SetChange();
+            $CardChanges[ $setcode ]->setname = $setname;
+        }
+        
+        $CardChanges[ $setcode ]->changes[] = $change;
+    }
 }
 
 class SetChange
 {
-	public $total;
-	public $setname;
-	public $changes = array();
+    public $total;
+    public $setname;
+    public $changes = array();
 };
 
 class Change
 {
-	public $difference;
-	public $date;	
+    public $difference;
+    public $date;    
 }
 
 
@@ -200,12 +200,12 @@ $args['isloggedin'] = $IsLoggedIn;
 
 if ( $LoginErrorMessage != null )
 {
-	$args['loginerrormessage'] = $LoginErrorMessage;
+    $args['loginerrormessage'] = $LoginErrorMessage;
 }
 $args['loginurl'] = $_SERVER['PHP_SELF'];
 if ( $IsLoggedIn )
 {
-	$args['username'] = $_SESSION['username'];
+    $args['username'] = $_SESSION['username'];
 }
 echo $template->render($args);
 
@@ -213,7 +213,7 @@ echo $template->render($args);
 /// CARD DETAILS
 
 $template = $twig->loadTemplate( 'carddetails.twig' );
-	
+    
 $args['showownerships'] = $IsLoggedIn;
 $args['card'] = $CardObj;
 $args['setindex'] = $SelectedSetIndex;

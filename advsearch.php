@@ -17,8 +17,8 @@ $SQLUser = $SQLUsers['oracle_search'];
 $DelverDBLink = new mysqli("localhost", $SQLUser->username, $SQLUser->password, "delverdb");
 if ( $DelverDBLink->connect_errno )
 {
-	$DBLog->err( "Connection error (".$DelverDBLink->connect_errno.") ".$DelverDBLink->connect_error );
-	die( "Connection error" );
+    $DBLog->err( "Connection error (".$DelverDBLink->connect_errno.") ".$DelverDBLink->connect_error );
+    die( "Connection error" );
 }
 
 $template = $twig->loadTemplate('header.twig');
@@ -27,18 +27,18 @@ $args["title"] = "Advanced Search - DDB";
 $args["heading"] = "Advanced Search";
 $args['isloggedin'] = $IsLoggedIn;
 if($LoginErrorMessage != null)
-	$args['loginerrormessage'] = $LoginErrorMessage;
+    $args['loginerrormessage'] = $LoginErrorMessage;
 $args['loginurl'] = $_SERVER['PHP_SELF'];
 if($IsLoggedIn)
 {
-	$args['username'] = $_SESSION['username'];
+    $args['username'] = $_SESSION['username'];
 }
 
 $args['scripts'] = array
 (
-	'<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>',
-	'<script type="text/javascript" src="common.js" ></script>',
-	'<script type="text/javascript" src="advsearch.js" ></script>'
+    '<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>',
+    '<script type="text/javascript" src="common.js" ></script>',
+    '<script type="text/javascript" src="advsearch.js" ></script>'
 );
 
 echo $template->render($args);
@@ -50,44 +50,44 @@ $template = $twig->loadTemplate('advsearch.twig');
 
 class ParameterType
 {
-	public $id;
-	public $name;
-	public $boolField;
-	public $defaultbool;
-	public $fieldtype;
-	public $optiongroups = array();
-	public $options = array();
-	public function ParameterType($_id, $_name, $_usebool, $_defaultbool, $_fieldType)
-	{
-		$this->id = $_id;
-		$this->name = $_name;
-		$this->boolField = $_usebool;
-		$this->defaultbool = $_defaultbool;
-		$this->fieldtype = $_fieldType;
-	}
+    public $id;
+    public $name;
+    public $boolField;
+    public $defaultbool;
+    public $fieldtype;
+    public $optiongroups = array();
+    public $options = array();
+    public function ParameterType($_id, $_name, $_usebool, $_defaultbool, $_fieldType)
+    {
+        $this->id = $_id;
+        $this->name = $_name;
+        $this->boolField = $_usebool;
+        $this->defaultbool = $_defaultbool;
+        $this->fieldtype = $_fieldType;
+    }
 };
 
 class OptionGroup
 {
-	public $title;
-	public $options = array();
-	
-	public function OptionGroup($_title)
-	{
-		$this->title = $_title;
-	}
+    public $title;
+    public $options = array();
+    
+    public function OptionGroup($_title)
+    {
+        $this->title = $_title;
+    }
 }
 class Option
 {
-	public $value;
-	public $label;
-	
-	public function Option($_value, $_label)
-	{
-		$this->value = $_value;
-		$this->label = $_label;
-	}
-	
+    public $value;
+    public $label;
+    
+    public function Option($_value, $_label)
+    {
+        $this->value = $_value;
+        $this->label = $_label;
+    }
+    
 }
 
 $args['parametertypes'] = array();
@@ -104,12 +104,12 @@ $expansions = new ParameterType('expansion', 'Expansion', true, 'or', 'groupsele
 $blocks = ddb\Defines::getBlockList();
 foreach ( $blocks as $block )
 {
-	$optGroup = new OptionGroup( $block->name );
-	foreach ( $block->sets as $set )
-	{
-		$optGroup->options[] = new Option( $set->code, $set->name );
-	}
-	$expansions->optiongroups[] = $optGroup;
+    $optGroup = new OptionGroup( $block->name );
+    foreach ( $block->sets as $set )
+    {
+        $optGroup->options[] = new Option( $set->code, $set->name );
+    }
+    $expansions->optiongroups[] = $optGroup;
 }
 $args['parametertypes'][] = $expansions;
 
@@ -118,7 +118,7 @@ $args['parametertypes'][] = $expansions;
 $formats = new ParameterType('format', 'Format', true, 'or', 'select');
 foreach ( $blocks as $block )
 {
-	$formats->options[] = new Option( $block->blockid, $block->name );
+    $formats->options[] = new Option( $block->blockid, $block->name );
 }
 
 $args['parametertypes'][] = $formats;
@@ -128,7 +128,7 @@ $colours = new ParameterType('colour', 'Colour', true, 'and', 'select');
 
 foreach ( ddb\Defines::$colourList as $symbol => $colour )
 {
-	$colours->options[] = new Option($symbol, $colour->name);
+    $colours->options[] = new Option($symbol, $colour->name);
 }
 $args['parametertypes'][] = $colours;
 
@@ -144,7 +144,7 @@ $types = new ParameterType('type', 'Type', true, 'and', 'select');
 $typeList = ddb\Defines::getTypeList();
 foreach ( $typeList as $type )
 {
-	$types->options[] = new Option($type, $type);
+    $types->options[] = new Option($type, $type);
 }
 $args['parametertypes'][] = $types;
 
@@ -153,7 +153,7 @@ $subtypes = new ParameterType('subtype', 'Subtype', true, 'and', 'select');
 $subtypeList = ddb\Defines::getSubtypeList();
 foreach ( $subtypeList as $subtype )
 {
-	$subtypes->options[] = new Option( $subtype, $subtype );
+    $subtypes->options[] = new Option( $subtype, $subtype );
 }
 $args['parametertypes'][] = $subtypes;
 
@@ -173,7 +173,7 @@ $args['parametertypes'][] = new ParameterType("toughness", "Toughness", true, 'o
 $rarities = new ParameterType('rarity', 'Rarity', true, 'and', 'select');
 foreach ( ddb\Defines::$rarityList as $symbol => $name)
 {
-	$rarities->options[] = new Option( $symbol, $name );
+    $rarities->options[] = new Option( $symbol, $name );
 }
 $args['parametertypes'][] = $rarities;
 
@@ -183,7 +183,7 @@ $args['parametertypes'][] = new ParameterType( "artist", "Artist", true, 'and', 
 /// USER COUNT
 if ( $IsLoggedIn == true )
 {
-	$args['parametertypes'][] = new ParameterType( 'count', 'Count', true, 'and', 'numeric' );
+    $args['parametertypes'][] = new ParameterType( 'count', 'Count', true, 'and', 'numeric' );
 }
 
 /// TAGS
@@ -193,25 +193,25 @@ $TagResults = $TagStmt->get_result();
 $tags = new ParameterType( 'tag', 'Tag', false, null, 'select' );
 while ( $row = $TagResults->fetch_assoc() )
 {
-	$tags->options[] = new Option( $row['name'], $row['name'] );	
+    $tags->options[] = new Option( $row['name'], $row['name'] );    
 }
 $args['parametertypes'][] = $tags;
 
 /// SORT
 
 $SortLabelToValue = array(
-	'Name' =>'name',
-	'ID' =>'id',
-	'CMC' =>'cmc',
-	'Power' =>'power',
-	'Toughess' =>'toughness',
-	'Type' => 'type',
+    'Name' =>'name',
+    'ID' =>'id',
+    'CMC' =>'cmc',
+    'Power' =>'power',
+    'Toughess' =>'toughness',
+    'Type' => 'type',
 );
 
 $sort = new ParameterType('order', 'Sort', false, null, 'select');
 foreach($SortLabelToValue as $label => $value)
 {
-	$sort->options[] = new Option($value, $label);
+    $sort->options[] = new Option($value, $label);
 }
 $args['parametertypes'][] = $sort;
 

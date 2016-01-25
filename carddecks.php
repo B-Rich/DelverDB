@@ -18,10 +18,10 @@ $SQLUser = $SQLUsers['deckmaker'];
 $DelverDBLink = new mysqli( "localhost", $SQLUser->username, $SQLUser->password, "delverdb" );
 if ( $DelverDBLink->connect_errno )
 {
-	$errno = $DelverDBLink->connect_errno;
-	$error = $DelverDBLink->connect_error;
-	$DBLog->err( "Connection error (".$errno.") ".$error );
-	die( "Connection error ($errno)" );
+    $errno = $DelverDBLink->connect_errno;
+    $error = $DelverDBLink->connect_error;
+    $DBLog->err( "Connection error (".$errno.") ".$error );
+    die( "Connection error ($errno)" );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -30,7 +30,7 @@ if ( $DelverDBLink->connect_errno )
 $CardID = null;
 if ( array_key_exists( 'id', $_GET ) == false )
 {
-	die( "No card ID supplied." );
+    die( "No card ID supplied." );
 }
 $CardID = $_GET["id"];
 
@@ -39,36 +39,36 @@ $CardID = $_GET["id"];
 
 class Deck
 {
-	public $ID;
-	public $ownerID;
-	public $name;
-	public $dateCreated;
-	public $dateModified;
+    public $ID;
+    public $ownerID;
+    public $name;
+    public $dateCreated;
+    public $dateModified;
 };
 
 $UserDeckArray = array();
 
 $DeckDetailsStmt = $DelverDBLink->prepare( "SELECT deckid, deckname, datecreated, datemodified FROM decklists WHERE ownerid = ? ORDER BY datemodified DESC" )
-	or die( $DelverDBLink->error );
+    or die( $DelverDBLink->error );
 $DeckDetailsStmt->bind_param( 'i', $UserID );
 $DeckDetailsStmt->execute();
 $DeckDetailsResult = $DeckDetailsStmt->get_result();
 
 while ( $deckDetailRow = $DeckDetailsResult->fetch_assoc() )
 {
-	$deck = new Deck();
-	$deck->ID = $deckDetailRow['deckid'];
-	$deck->name = $deckDetailRow['deckname'];
-	$deck->dateCreated = $deckDetailRow['datecreated'];
-	$deck->dateModified = $deckDetailRow['datemodified'];
-	$UserDeckArray[$deck->ID] = $deck;
+    $deck = new Deck();
+    $deck->ID = $deckDetailRow['deckid'];
+    $deck->name = $deckDetailRow['deckname'];
+    $deck->dateCreated = $deckDetailRow['datecreated'];
+    $deck->dateModified = $deckDetailRow['datemodified'];
+    $UserDeckArray[$deck->ID] = $deck;
 }
 
 
 $DeckCardArray = array();
 
 $DeckCardStmt = $DelverDBLink->prepare( "SELECT deckid, count FROM deckcards WHERE cardid = ?")
-	or die( $DelverDBLink->error );
+    or die( $DelverDBLink->error );
 $DeckCardStmt->bind_param( 'i', $CardID );
 $DeckCardStmt->execute();
 
@@ -76,13 +76,13 @@ $DeckCardResults= $DeckCardStmt->get_result();
 
 while ( $deckCardRow = $DeckCardResults->fetch_assoc() )
 {
-	$deckID = $deckCardRow['deckid'];
-	$count = $deckCardRow['count'];
-	
-	if ( array_key_exists( $deckID, $UserDeckArray ) == true )
-	{
-		$DeckCardArray[$deckID] = $count;
-	}
+    $deckID = $deckCardRow['deckid'];
+    $count = $deckCardRow['count'];
+    
+    if ( array_key_exists( $deckID, $UserDeckArray ) == true )
+    {
+        $DeckCardArray[$deckID] = $count;
+    }
 }
 
 
@@ -103,11 +103,11 @@ $args["heading"] = "Advanced Search Results";
 $args['isloggedin'] = $IsLoggedIn;
 
 if($LoginErrorMessage != null)
-	$args['loginerrormessage'] = $LoginErrorMessage;
+    $args['loginerrormessage'] = $LoginErrorMessage;
 $args['loginurl'] = $_SERVER['PHP_SELF'];
 if($IsLoggedIn)
 {
-	$args['username'] = $_SESSION['username'];
+    $args['username'] = $_SESSION['username'];
 }
 echo $template->render($args);
 
@@ -117,10 +117,10 @@ echo $template->render($args);
 echo '<table>';
 foreach ( $DeckCardArray as $deckID => $count )
 {
-	echo '<tr>';
-	$deck = $UserDeckArray[$deckID];
-	echo "<td>$deck->ID</td><td>$deck->name</td><td>$count</td>";
-	echo '</tr>';
+    echo '<tr>';
+    $deck = $UserDeckArray[$deckID];
+    echo "<td>$deck->ID</td><td>$deck->name</td><td>$count</td>";
+    echo '</tr>';
 }
 echo '</table>';
 
