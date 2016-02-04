@@ -13,7 +13,7 @@ if ( $DelverDBLink->connect_errno )
     ReturnXMLError( 0, "Internal error: $str" );
 }
 
-$mode = "oracle";
+$mode = $argv[1];
 
 if ( $mode == "oracle" )
 {
@@ -155,44 +155,17 @@ else if ( $mode == "cardsets" )
     header('Content-Type: text/xml;  charset=utf-8');
     echo $responseXML->asXML();
 }
-else if ( $mode == "subtype" || $mode == "type" )
-{
-    
-    $SearchStmt = $DelverDBLink->prepare( "SELECT DISTINCT $mode FROM oracle" );
-    $SearchStmt->execute();
-    $SearchResults = $SearchStmt->get_result();
-    
-    $allTypes = array();
-    
-    $i = 0;
-    while ( $row = $SearchResults->fetch_assoc() )
-    {
-        $types = explode( ' ', $row[$mode] );
-        foreach ( $types as $key => $type )
-        {
-            $allTypes[$type] = ++$i;
-        }
-    }
-    
-    $allTypes = array_flip( $allTypes );
-    sort( $allTypes );
-    foreacH ( $allTypes as $type => $value )
-    {
-        print "\"$value\",  ";
-    }
-    
-}
 else if ( $mode == "setlist" )
 {
     $setListXml = new SimpleXMLElement( "<setlist></setlist>" );
     
     $blocks = ddb\Defines::getBlockList();
-    foreach ( $blocks as $blockid => $block )
+    foreach ( $blocks as $block )
     {
         $blockElement = $setListXml->addChild( "format" );
         $blockElement->addChild( "name", $block->name );
         
-        foreach ( $blocks->sets as $setcode => $set )
+        foreach ( $block->sets as $set )
         {
             $setElement = $blockElement->addChild( "set" );
             $setElement->addChild( "code", $set->code );
@@ -200,6 +173,7 @@ else if ( $mode == "setlist" )
         }
             
     }
+    
     echo $setListXml->asXML();
 }
 
