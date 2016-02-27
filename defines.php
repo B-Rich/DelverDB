@@ -33,12 +33,16 @@ abstract class Defines
         }
         
         $user = $SQLUsers['oracle_search'];
+        // Note: leave that backslash there
         Defines::$DelverDBLink = new \mysqli("localhost", $user->username, $user->password, "delverdb");
         if ( Defines::$DelverDBLink->connect_errno )
         {
             $DBLog->err( "Connection error (" . Defines::$DelverDBLink->connect_errno . ") " . Defines::$DelverDBLink->connect_error );
             die( "Connection error" );
         }
+        
+        $stmt = Defines::$DelverDBLink->prepare( "SET NAMES 'utf8'" ) or die( $DelverDBLink->error );
+        $stmt->execute();
     }
     
     public static function getSetList()
