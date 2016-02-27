@@ -415,10 +415,11 @@ function formatCardMatch($format, $comp)
     $count = 0;
     foreach($sets as $set)
     {
-        if($count++ != 0)
+        if($count != 0)
             $str .= " OR ";
         
-        array_push($QueryStack, $set);
+        $count++;
+        array_push($QueryStack, $set->code);
         array_push($QueryFormat, "s");
         $str .= " cardsets.setcode = ? ";
     }
@@ -430,13 +431,13 @@ function colourCardMatch($colour, $comp)
 {
     global $QueryStack, $QueryFormat, $WarningMessages, $ParamsDisplay, $ParamsDisplay;
     
-    if ( $array_key_exists( $colour, ddb\Defines::$colourList ) )
+    if ( !array_key_exists( $colour, ddb\Defines::$colourList ) )
     {
         $WarningMessages[] = "Unrecognised colour '$colour' used.";
         return " ( FALSE ) ";
     }
     
-    $bitflag = ddb\Defines::$colouRList[$colour]->flag;
+    $bitflag = ddb\Defines::$colourList[$colour]->flag;
     array_push($QueryStack, $bitflag);
     array_push($QueryFormat, "i");
     return " (cards.colour & ?) ";
@@ -715,12 +716,12 @@ function CreateQuery( $_allParams )
         else
         {
             $colourFlags = 0;
-            foreach ( Defines::$ColourSymbolsToInt as $symbol => $flag )
+            foreach ( ddb\Defines::$colourList as $symbol => $colour )
             {
                 if ( array_key_exists( $symbol, $selectedColours) == false )
                 {
-                    $SearchLog->log( "Flag: $flag" );
-                    $colourFlags |= $flag;
+                    //$SearchLog->log( "Flag: $flag" );
+                    $colourFlags |= $colour->flag;
                 }
             }
             
